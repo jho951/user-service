@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "backend/**"
+      - "**"
       - ".github/workflows/**"
 
 permissions:
@@ -60,7 +60,7 @@ jobs:
       - name: Build & Push image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: .               # ✅ ./backend → . (루트 기준)
           push: true
           tags: |
             ghcr.io/${{ env.OWNER_LC }}/${{ env.DOCKER_IMAGE_NAME }}:${{ needs.makeTagAndRelease.outputs.tag_name }}
