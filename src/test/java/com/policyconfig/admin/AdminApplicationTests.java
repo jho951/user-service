@@ -1,4 +1,4 @@
-package com.admin;
+package com.policyconfig.admin;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
