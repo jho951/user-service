@@ -8,7 +8,7 @@ public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;   // v1은 Long auto-increment로
+	private Long id;
 
 	@Column(nullable = false, unique = true, length = 50)
 	private String username;
@@ -19,9 +19,7 @@ public class User {
 	@Column(nullable = false, unique = true, length = 100)
 	private String email;
 
-	protected User() {
-		// JPA용 기본 생성자 (외부에서 new User() 쓰지 말라는 의도)
-	}
+	protected User() {}
 
 	public User(String username, String password, String email) {
 		this.username = username;
