@@ -10,8 +10,8 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: local
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+#      DB_USERNAME: ${DB_USERNAME}
+#      DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL}
 
