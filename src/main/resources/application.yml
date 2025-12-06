@@ -1,22 +1,3 @@
 spring:
-  application:
-    name: admin
   profiles:
     default: dev
-    group:
-      dev:
-        - server
-        - db
-        - data
-        - auth
-        - docs
-        - secret
-        - dev
-      prod:
-        - server
-        - db
-        - data
-        - auth
-        - docs
-        - secret
-        - prod
