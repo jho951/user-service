@@ -9,6 +9,5 @@ class AdminApplicationTests {
 
 	@Test
 	@Disabled("v1에서는 컨텍스트 로딩 테스트 비활성화")
-	void contextLoads() {
-	}
+	void contextLoads() {}
 }

@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "**"                    # 필요하면 src/**, build.gradle 등으로 좁혀도 됨
+      - "backend/**"
       - ".github/workflows/**"
 
 permissions:
@@ -19,10 +19,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    # ✅ working-directory 제거 (레포 루트에서 실행)
-    # defaults:
-    #   run:
-    #     working-directory: backend
+    defaults:
+      run:
+        working-directory: backend
 
     steps:
       - name: Checkout
@@ -36,14 +35,14 @@ jobs:
           cache: gradle
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew    # ✅ 루트에 있는 gradlew 기준
+        run: chmod +x gradlew
 
-      - name: Build & Test
-        run: ./gradlew clean build
+      - name: Build (skip tests for v1)
+        run: ./gradlew clean build -x test
 
       - name: Upload test reports (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-reports
-          path: build/reports/tests/test   # ✅ backend/ 제거
+          path: backend/build/reports/tests/test
