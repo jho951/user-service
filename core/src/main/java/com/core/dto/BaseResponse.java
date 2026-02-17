@@ -2,35 +2,26 @@ package com.core.dto;
 
 import com.core.exception.ErrorCode;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Builder;
 
 /**
  * API 공통 응답 래퍼
- *
  * @param <T> data 페이로드 타입
  */
 @Getter
 public class BaseResponse<T> {
 
-	/**
-	 * 요청 성공 여부
-	 */
+	/** 요청 성공 여부 */
 	private final boolean success;
 
-	/**
-	 * 비즈니스 에러 코드 (성공 시 "OK" 등)
-	 */
+	/** 비즈니스 에러 코드 (성공 시 "OK" 등) */
 	private final String code;
 
-	/**
-	 * 사용자에게 보여줄 메시지
-	 */
+	/** 사용자에게 보여줄 메시지 */
 	private final String message;
 
-	/**
-	 * 실제 응답 데이터
-	 */
+	/** 실제 응답 데이터 */
 	private final T data;
 
 	@Builder
@@ -41,7 +32,6 @@ public class BaseResponse<T> {
 		this.data = data;
 	}
 
-	// ------------------- 정적 팩토리 메서드 -------------------
 
 	/**
 	 * 성공 응답 (기본 메시지 "성공")
@@ -79,9 +69,7 @@ public class BaseResponse<T> {
 			.build();
 	}
 
-	/**
-	 * 에러 응답 (메시지 오버라이드)
-	 */
+	/** 에러 응답 (메시지 오버라이드) */
 	public static <T> BaseResponse<T> error(ErrorCode errorCode, String message) {
 		return BaseResponse.<T>builder()
 			.success(false)

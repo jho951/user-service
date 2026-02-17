@@ -1,36 +1,17 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
-
-group = 'com.core'
-version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-}
-
-repositories {
-    mavenCentral()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 dependencies {
-    // ✅ BaseEntity 때문에 필요한 JPA 어노테이션
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    api 'org.springframework.data:spring-data-jpa'
+    api 'jakarta.persistence:jakarta.persistence-api:3.1.0'
 
-    // ✅ Lombok (반드시 버전 명시!)
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
-
-    // ✅ 테스트는 JUnit 정도만 (Spring 테스트 X)
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
-tasks.named('test') {
-    // JUnit 플랫폼 설정(있어도 되고 없어도 됨, 어차피 비활성)
-    useJUnitPlatform()
-    failOnNoDiscoveredTests = false
-
-    // ✅ v1에서는 아예 테스트 실행을 비활성화
-    enabled = false
 }

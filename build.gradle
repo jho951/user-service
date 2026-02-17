@@ -1,14 +1,21 @@
 plugins {
-    id 'java'
+    id 'io.spring.dependency-management' version '1.1.6' apply false
 }
 
 allprojects {
-    repositories {
-        mavenCentral()
-    }
+    group = 'com.admin'
+    version = '0.0.1-SNAPSHOT'
 }
 
 subprojects {
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:3.3.5"
+        }
+    }
+
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
         failOnNoDiscoveredTests = false

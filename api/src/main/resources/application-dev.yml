@@ -23,3 +23,15 @@ admin:
     username: superadmin
     email: superadmin@example.com
     password: superadmin1234
+
+auth:
+  endpoints-enabled: true
+  auto-security: true
+  bearer-prefix: Bearer
+  refresh-cookie-enabled: true
+  refresh-cookie-secure: false
+  refresh-cookie-name: "ADMIN_REFRESH_TOKEN"
+  jwt:
+    secret: ${JWT_SECRET:abcdefghijklmnopqrstuvwxyz12345678901234567890}
+    access-seconds: 3600
+    refresh-seconds: 1209600

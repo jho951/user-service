@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 애플리케이션 시작 시 기본 SUPER_ADMIN 계정을 보장합니다.
+ */
 @Component
 public class SuperAdminInitializer implements CommandLineRunner {
 
@@ -24,6 +27,12 @@ public class SuperAdminInitializer implements CommandLineRunner {
 	@Value("${admin.super.password:superadmin1234}")
 	private String superPassword;
 
+	/**
+	 * 생성자 주입입니다.
+	 *
+	 * @param userRepository 관리자 사용자 저장소
+	 * @param passwordEncoder 비밀번호 인코더
+	 */
 	public SuperAdminInitializer(
 		UserRepository userRepository,
 		PasswordEncoder passwordEncoder
@@ -32,19 +41,20 @@ public class SuperAdminInitializer implements CommandLineRunner {
 		this.passwordEncoder = passwordEncoder;
 	}
 
+	/**
+	 * 기본 최고 관리자 계정이 없을 때만 생성합니다.
+	 *
+	 * @param args 실행 인자
+	 */
 	@Override
 	@Transactional
 	public void run(String... args) {
-		// 이미 SUPER_ADMIN 이 존재하면 아무 작업도 안 함
 		if (userRepository.existsByRole(UserRole.SUPER_ADMIN)) {
 			return;
 		}
-
-		// 혹시 이메일로도 이미 존재하면 역시 스킵
 		if (userRepository.existsByEmail(superEmail)) {
 			return;
 		}
-
 		User superAdmin = User.builder()
 			.username(superUsername)
 			.email(superEmail)
@@ -54,9 +64,5 @@ public class SuperAdminInitializer implements CommandLineRunner {
 			.build();
 
 		userRepository.save(superAdmin);
-
-		System.out.println("✅ Super admin created");
-		System.out.println("   email: " + superEmail);
-		System.out.println("   username: " + superUsername);
 	}
 }

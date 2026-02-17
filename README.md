@@ -39,6 +39,37 @@ v2부터는 인증·권한, 공통 인프라 모듈(ip-guard, audit-log 등)을 
 
 ---
 
+## 🔐 로그인 (auth 모듈 연동)
+
+이 프로젝트는 `io.github.jho951:auth-config` 모듈을 사용합니다.  
+모듈이 아래 인증 API를 자동으로 제공합니다.
+
+상세 설명은 `docs/AUTH_LOGIN_GUIDE.md`를 참고하세요.
+
+- `POST /auth/login`
+- `POST /auth/refresh`
+- `POST /auth/logout`
+
+### 로그인 요청 예시
+
+```bash
+curl -i -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"superadmin","password":"superadmin1234"}'
+```
+
+- 응답 본문: `accessToken`
+- 응답 쿠키: `ADMIN_REFRESH_TOKEN` (refresh token, HttpOnly)
+
+### 보호된 API 호출 예시
+
+```bash
+curl http://localhost:8080/api/admin/users \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+```
+
+---
+
 ## 🛠 기술 스택
 
 - **Language**: Java 17
@@ -75,3 +106,4 @@ src
     └─ resources
         ├─ application.yml                  # 공통 설정(placeholder)
         └─ application-local.yml            # 로컬(H2) 프로필 설정
+```
