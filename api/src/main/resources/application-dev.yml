@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:admin;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+admin:
+  super:
+    username: superadmin
+    email: superadmin@example.com
+    password: superadmin1234
+
+auth:
+  endpoints-enabled: true
+  auto-security: true
+  bearer-prefix: Bearer
+  refresh-cookie-enabled: true
+  refresh-cookie-secure: false
+  refresh-cookie-name: "ADMIN_REFRESH_TOKEN"
+  jwt:
+    secret: ${JWT_SECRET:abcdefghijklmnopqrstuvwxyz12345678901234567890}
+    access-seconds: 3600
+    refresh-seconds: 1209600

@@ -1,77 +1,82 @@
-# Admin Backend v1
+# Admin Backend v2
 
-간단한 **운영자용 어드민 페이지 백엔드(v1)** 레포지토리입니다.  
-현재 목표는 **“빠르게 돌려볼 수 있는 최소한의 어드민 API”** 를 만드는 것이고,  
-v2부터는 인증·권한, 공통 인프라 모듈(ip-guard, audit-log 등)을 연동할 예정입니다.
+운영자(Admin) API 백엔드입니다.  
+`v2`에서는 멀티모듈(`api`, `core`) 구조와 인증 모듈(`auth-config`) 연동이 포함됩니다.
 
----
+## Modules
 
-## ✨ 목표 / 컨셉
+- `api`: Spring Boot 실행 모듈, 인증/사용자 관리 API
+- `core`: 공통 도메인/예외/DTO
 
-- 어드민 페이지에서 사용할 **REST API 백엔드** 제공
-- v1에서는 **인증/권한 없이** 내부망/개발환경에서만 사용
-- H2 메모리 DB 사용 → 빠르게 개발/테스트
-- 계층 구조를 명확히 나눠서 이후 v2, v3…로 자연스럽게 확장 가능
+## Tech Stack
 
----
+- Java 17
+- Spring Boot 3.3.5
+- Spring Data JPA, Spring Security, Validation
+- H2 (dev)
+- Gradle 9.x
 
-## ✅ 현재 v1 기능 범위
+## Prerequisites
 
-> ※ v1은 **개발·내부용** 최소 기능 버전입니다. (실 서비스용 아님)
+- JDK 17
+- GitHub Packages 접근 가능한 PAT (`read:packages`)
 
-- 헬스 체크
-    - `GET /api/admin/health` → `"OK"`
-- 사용자 관리 (Admin User)
-    - `GET /api/admin/users` : 사용자 목록 조회
-    - `POST /api/admin/users` : 사용자 생성
-    - `PUT /api/admin/users/{id}` : 이메일 수정 등 일부 정보 수정
-    - `DELETE /api/admin/users/{id}` : 사용자 삭제
-- H2 콘솔 제공
-    - `/h2-console` (로컬/개발용)
+## Quick Start
 
-### v2 이후 로드맵(예정)
+1. GitHub Packages 인증 정보 설정
 
-- Spring Security + JWT 기반 인증/인가
-- ip-guard 모듈 연동 (IP 화이트리스트)
-- audit-log 모듈 연동 (관리자 액션 감사 로그)
-- MySQL 등 외부 DB 연동 및 프로필 분리
-- rate-limiter, notification, feature-flag 등 공통 인프라 모듈 순차 적용
+```bash
+export GITHUB_ACTOR=<github-username>
+export GITHUB_TOKEN=<github-pat>
+```
 
----
+또는 `~/.gradle/gradle.properties`:
 
-## 🛠 기술 스택
+```properties
+gprUser=<github-username>
+gprKey=<github-pat>
+```
 
-- **Language**: Java 17
-- **Framework**: Spring Boot 3.x
-    - `spring-boot-starter-web`
-    - `spring-boot-starter-data-jpa`
-- **Database (v1)**: H2 (in-memory)
-- **Build**: Gradle
-- **Container**: Docker, Docker Compose (옵션)
+2. 빌드/실행
 
----
+```bash
+./gradlew clean :api:bootRun
+```
 
-## 📁 프로젝트 구조
+기본 프로필은 `dev`이며, 서버는 `http://localhost:8080`으로 실행됩니다.
 
-> 패키지 기준: `com.admin`
+## Authentication
 
-```text
-src
- └─ main
-    ├─ java
-    │   └─ com.admin
-    │       ├─ AdminApplication.java        # 진입점
-    │       ├─ config
-    │       │   └─ WebConfig.java           # CORS 등 Web 공통 설정
-    │       ├─ domain
-    │       │   └─ User.java                # 어드민 사용자 엔티티
-    │       ├─ repository
-    │       │   └─ UserRepository.java      # JPA 리포지토리
-    │       ├─ service
-    │       │   └─ UserService.java         # 도메인 비즈니스 로직
-    │       └─ controller
-    │           ├─ UserAdminController.java # /api/admin/users
-    │           └─ HealthController.java    # /api/admin/health
-    └─ resources
-        ├─ application.yml                  # 공통 설정(placeholder)
-        └─ application-local.yml            # 로컬(H2) 프로필 설정
+`io.github.jho951:auth-config:1.0.8` 모듈이 아래 엔드포인트를 제공합니다.
+
+- `POST /auth/login`
+- `POST /auth/refresh`
+- `POST /auth/logout`
+
+상세 내용: `docs/AUTH_LOGIN_GUIDE.md`
+
+## Admin APIs
+
+- `GET /api/admin/users`
+- `POST /api/admin/users`
+- `PUT /api/admin/users/{id}`
+- `DELETE /api/admin/users/{id}`
+
+## Local Default Admin
+
+앱 시작 시 기본 SUPER_ADMIN 계정이 자동 생성됩니다.
+
+- username: `superadmin`
+- password: `superadmin1234`
+
+구현: `api/src/main/java/com/api/config/SuperAdminInitializer.java`
+
+## Secret Management
+
+- 저장소의 `gradle.properties`에는 실제 키를 넣지 않습니다.
+- 실제 값은 환경변수 또는 `~/.gradle/gradle.properties`를 사용합니다.
+- 토큰/웹훅/JWT 시크릿이 노출되면 즉시 폐기 후 재발급하세요.
+
+## Troubleshooting
+
+- `401 Unauthorized`로 `auth-config` 다운로드 실패 시: `docs/GITHUB_PACKAGES_TROUBLESHOOTING.md`
