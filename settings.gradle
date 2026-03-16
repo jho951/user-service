@@ -1,5 +1,6 @@
-rootProject.name = 'admin'
-include 'core', 'api'
+rootProject.name = 'User-service'
+include 'core'
+include 'api'
 
 def firstNonBlank = { List<String> values ->
     values.find { it != null && !it.trim().isEmpty() }
