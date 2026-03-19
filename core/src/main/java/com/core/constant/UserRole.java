@@ -1,7 +1,7 @@
 package com.core.constant;
 
 /**
- * 애플리케이션에서 사용하는 사용자 권한(Role) 상수(enum)입니다.
+ * 사용자 권한(Role) 상수(enum)입니다.
  *
  * <p>Spring Security의 권한 체계와 호환되도록 각 Role은 {@code ROLE_} 접두어가 포함된
  * authority 문자열을 가집니다.</p>

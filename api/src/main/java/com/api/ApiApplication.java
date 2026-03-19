@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 /**
- * Admin API 애플리케이션의 시작점입니다.
+ * User Service 애플리케이션의 시작점입니다.
  *
  * <p>JPA Auditing을 활성화해 {@code BaseEntity}의 생성/수정 시각을 자동 관리합니다.</p>
  */

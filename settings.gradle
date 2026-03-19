@@ -1,33 +1,9 @@
-rootProject.name = 'admin'
-include 'core', 'api'
-
-def firstNonBlank = { List<String> values ->
-    values.find { it != null && !it.trim().isEmpty() }
-}
-
-def githubPackagesUser = firstNonBlank([
-        System.getenv("GH_ACTOR"),
-        providers.gradleProperty("gprUser").orNull
-])
-
-def githubPackagesToken = firstNonBlank([
-        System.getenv("GH_PACKAGES_TOKEN"),
-        providers.gradleProperty("gprKey").orNull
-])
+rootProject.name = 'User-server'
+include 'core'
+include 'api'
 
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-
-        maven {
-            url = uri("https://maven.pkg.github.com/jho951/auth")
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                username = githubPackagesUser
-                password = githubPackagesToken
-            }
-        }
     }
 }

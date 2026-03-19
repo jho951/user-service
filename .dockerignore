@@ -1,10 +1,21 @@
-.git
-.gitignore
+# Gradle 캐시 디렉토리
 .gradle
 build
-out
+app/build
+common/build
+
+# IntelliJ IDEA / VSCode 설정
 .idea
+.vscode
+
+# OS / Git 관련 파일
+.DS_Store
 *.iml
-Dockerfile*
-docker-compose.yml
+*.log
+
+# 환경 파일 (민감 정보는 Git에 포함하지 않도록 주의)
 .env*
+
+# 테스트 리포트, 커버리지 등
+test-results/
+coverage/

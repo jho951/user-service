@@ -1,3 +1,6 @@
+server:
+  port: 8082
+
 spring:
   datasource:
     url: jdbc:h2:mem:admin;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
@@ -18,20 +21,13 @@ spring:
       enabled: true
       path: /h2-console
 
-admin:
-  super:
-    username: superadmin
-    email: superadmin@example.com
-    password: superadmin1234
+user-service:
+  base-url: ${USER_SERVICE_BASE_URL:http://localhost:8082}
 
-auth:
-  endpoints-enabled: true
-  auto-security: true
-  bearer-prefix: Bearer
-  refresh-cookie-enabled: true
-  refresh-cookie-secure: false
-  refresh-cookie-name: "ADMIN_REFRESH_TOKEN"
+security:
   jwt:
-    secret: ${JWT_SECRET:abcdefghijklmnopqrstuvwxyz12345678901234567890}
-    access-seconds: 3600
-    refresh-seconds: 1209600
+    enabled: true
+    issuer: ${AUTH_JWT_ISSUER:auth-service}
+    secret: ${AUTH_JWT_SECRET:abcdefghijklmnopqrstuvwxyz12345678901234567890}
+    audience: ${AUTH_JWT_AUDIENCE:user-service}
+    internal-scope: ${AUTH_INTERNAL_SCOPE:internal}

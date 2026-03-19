@@ -18,6 +18,7 @@ public enum ErrorCode {
 	// 사용자 관련 에러 예시
 	USER_NOT_FOUND("U404", 404, "사용자를 찾을 수 없습니다."),
 	EMAIL_ALREADY_EXISTS("U400",400,  "이미 사용 중인 이메일입니다."),
+	SOCIAL_ACCOUNT_ALREADY_EXISTS("U401", 400, "이미 연결된 소셜 계정입니다."),
 	INVALID_LOGIN( "U401",400, "이메일 또는 비밀번호가 올바르지 않습니다."),
 	USER_DISABLED("U402",400,"허용되지 않는 유저입니다."),
 	INVALID_CREDENTIALS("U403",400,"권한이 없습니다."),
