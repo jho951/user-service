@@ -1,3 +1,17 @@
 spring:
   profiles:
     default: dev
+
+features:
+  public-user-api:
+    enabled: false
+  internal-user-api:
+    enabled: true
+
+security:
+  jwt:
+    enabled: true
+    issuer: ${AUTH_JWT_ISSUER:auth-service}
+    secret: ${AUTH_JWT_SECRET:abcdefghijklmnopqrstuvwxyz12345678901234567890}
+    audience: ${AUTH_JWT_AUDIENCE:user-service}
+    internal-scope: ${AUTH_INTERNAL_SCOPE:internal}

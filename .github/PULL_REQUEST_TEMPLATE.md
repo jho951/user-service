@@ -1,47 +1,56 @@
-name: 'Pull Request'
-description: '기능 개발, 수정, 버그 수정 등을 위한 Pull Request 템플릿입니다.'
+# 📦 Pull Request 제목
 
-body:
-  - type: markdown
-    attributes:
-      value: |
-        ## 📌 변경 사항
-        아래에 이번 PR에서 변경한 내용을 간단히 작성해주세요.
-        예시:
-        - Redis 설정 추가
-        - 로그인 토큰 Redis 저장 기능 구현
+<!-- ex. feat: 기능 추가 -->
 
-  - type: checkboxes
-    attributes:
-      label: 🛠 작업 유형
-      description: 해당하는 항목을 선택해주세요.
-      options:
-        - label: 코드 수정
-        - label: 문서 수정
-        - label: 테스트 추가/수정
-        - label: 의존성 추가/변경
-        - label: 설정 파일 수정
-        - label: 기타
+## ✅ 변경 내용 요약
 
-  - type: input
-    attributes:
-      label: 🔗 관련 이슈
-      description: 관련된 이슈 번호를 입력해주세요.
-      placeholder: 예) #3, #8
+<!-- 어떤 변경이 있었는지 간단히 서술해주세요 -->
 
-  - type: checkboxes
-    attributes:
-      label: ✅ 확인 사항
-      description: PR을 제출하기 전에 아래 항목들을 확인해주세요.
-      options:
-        - label: 코드 스타일을 지켰습니다.
-        - label: 테스트가 통과되었고 수정이 반영되었습니다.
-        - label: 관련 문서가 최신화되었습니다.
-        - label: 의존성 변경이 필요한 경우 검토를 완료했습니다.
-        - label: CI/CD 파이프라인이 정상 작동하는지 확인했습니다.
+-
+-
 
-  - type: textarea
-    attributes:
-      label: 💬 추가 설명
-      description: 특별히 리뷰어에게 알리고 싶은 내용이 있다면 작성해주세요.
-      placeholder: 예) 로그인 토큰 관리를 위해 Redis 도입 / 테스트 코드 부족
+## 🧩 관련 이슈
+
+<!-- 관련된 Issue 번호를 적어주세요 -->
+
+Closes #
+
+## 💻 변경 사항 상세 설명
+
+<!-- 코드 레벨의 설명이 필요한 경우 작성해주세요 -->
+
+-
+-
+
+## 🧪 테스트 방법
+
+<!-- 로컬 테스트 방법이나 테스트 결과를 설명해주세요 -->
+
+1. `npm run dev` 실행
+2. 브라우저에서 `/about` 확인
+3. 다크모드 토글 동작 확인
+
+## 🔍 체크리스트
+
+- [ ] 코드가 빌드 에러 없이 잘 작동하나요?
+- [ ] 타입스크립트 타입이 명확한가요?
+- [ ] Prettier와 ESLint 규칙을 따르나요?
+- [ ] UI가 몰입형/미니멀/지속가능한 UX 원칙에 부합하나요?
+- [ ] 다크모드에서도 문제가 없나요?
+- [ ] 다른 기능에 영향을 주지 않나요?
+
+## 🙋 기타 참고사항
+
+## <!-- 리뷰어가 알면 좋을 만한 내용을 적어주세요 -->
+
+## 🤖 AI Agent 협업 로그(필수)
+
+- prompts 링크: `prompts/...`
+- ADR 링크(결정이 있었다면): `docs/decisions/...`
+- REQUIREMENTS 업데이트 여부: `docs/REQUIREMENTS.md` 변경 포함/미포함 (사유)
+
+### 체크
+
+- [ ] 이번 변경에 대한 prompts 로그를 남겼나요?
+- [ ] 큰 결정(트레이드오프/정책 변경)은 ADR로 남겼나요?
+- [ ] 요구사항/가정이 바뀌면 REQUIREMENTS도 같이 갱신했나요?

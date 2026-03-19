@@ -1,12 +1,12 @@
-# Admin Backend v2
+# User Service
 
-운영자(Admin) API 백엔드입니다.  
-`v2`에서는 멀티모듈(`api`, `core`) 구조와 인증 모듈(`auth-config`) 연동이 포함됩니다.
+`User-server`는 사용자 도메인의 기준 시스템으로 동작하는 멀티모듈 백엔드입니다.
+현재 구조는 `auth-service`와 책임을 분리한 `user-service` 방향으로 정리되어 있습니다.
 
 ## Modules
 
-- `api`: Spring Boot 실행 모듈, 인증/사용자 관리 API
-- `core`: 공통 도메인/예외/DTO
+- `api`: Spring Boot 실행 모듈, 일반 회원/내부 연동 API
+- `core`: 공통 도메인/상수/예외/DTO
 
 ## Tech Stack
 
@@ -19,23 +19,17 @@
 ## Prerequisites
 
 - JDK 17
-- GitHub Packages 접근 가능한 PAT (`read:packages`)
 
 ## Quick Start
 
-1. GitHub Packages 인증 정보 설정
+1. 환경 변수 설정
 
 ```bash
-export GITHUB_ACTOR=<github-username>
-export GITHUB_TOKEN=<github-pat>
+export USER_SERVICE_BASE_URL=http://localhost:8082
 ```
 
-또는 `~/.gradle/gradle.properties`:
-
-```properties
-gprUser=<github-username>
-gprKey=<github-pat>
-```
+`USER_SERVICE_BASE_URL`은 서비스 분리 환경에서 user-service의 기준 URL입니다.
+기본값은 `http://localhost:8082`입니다.
 
 2. 빌드/실행
 
@@ -43,40 +37,48 @@ gprKey=<github-pat>
 ./gradlew clean :api:bootRun
 ```
 
-기본 프로필은 `dev`이며, 서버는 `http://localhost:8080`으로 실행됩니다.
+기본 프로필은 `dev`이며, 서버는 `http://localhost:8082`으로 실행됩니다.
 
-## Authentication
+## User APIs
 
-`io.github.jho951:auth-config:1.0.8` 모듈이 아래 엔드포인트를 제공합니다.
+분리된 `user-service` 성격의 API가 추가되어 있습니다.
 
-- `POST /auth/login`
-- `POST /auth/refresh`
-- `POST /auth/logout`
+- `GET /api/users/me`
+- `POST /api/users/signup`
+- `POST /internal/users`
+- `POST /internal/users/social`
+- `PATCH /internal/users/{userId}/status`
+- `GET /internal/users/{userId}`
+- `GET /internal/users/by-email?email=...`
+- `GET /internal/users/by-social?provider=GOOGLE&providerUserKey=...`
 
-상세 내용: `docs/AUTH_LOGIN_GUIDE.md`
+일반 회원 데이터는 `users`, `user_social_accounts` 테이블에 저장됩니다.
+비밀번호 저장 책임은 이 서버가 아닌 `auth-service`로 분리하는 것을 전제로 합니다.
 
-## Admin APIs
+## Security
 
-- `GET /api/admin/users`
-- `POST /api/admin/users`
-- `PUT /api/admin/users/{id}`
-- `DELETE /api/admin/users/{id}`
+`user-service`는 `auth-service`가 발급한 JWT를 직접 검증합니다.
 
-## Local Default Admin
+- 공개 API: `POST /api/users/signup`
+- 보호 API: `GET /api/users/me`
+- 내부 API: `/internal/users/**`
 
-앱 시작 시 기본 SUPER_ADMIN 계정이 자동 생성됩니다.
+기본 개발 설정:
 
-- username: `superadmin`
-- password: `superadmin1234`
+- `AUTH_JWT_ISSUER=auth-service`
+- `AUTH_JWT_SECRET=<shared-hmac-secret>`
+- `AUTH_JWT_AUDIENCE=user-service`
+- `AUTH_INTERNAL_SCOPE=internal`
 
-구현: `api/src/main/java/com/api/config/SuperAdminInitializer.java`
+현재 구현은 HMAC 서명 JWT를 기준으로 동작합니다. 운영 환경에서는 `auth-service`의 실제 서명 정책에 맞춰 키 관리나 JWK 기반 검증으로 전환하는 것이 바람직합니다.
+
+추가 정책:
+
+- `/api/users/me`는 인증된 사용자 토큰이면서 `status=ACTIVE`일 때만 허용됩니다.
+- `/internal/users/**`는 `scope` 또는 `scp` claim에 `internal`이 포함된 서비스 토큰만 허용됩니다.
 
 ## Secret Management
 
 - 저장소의 `gradle.properties`에는 실제 키를 넣지 않습니다.
 - 실제 값은 환경변수 또는 `~/.gradle/gradle.properties`를 사용합니다.
 - 토큰/웹훅/JWT 시크릿이 노출되면 즉시 폐기 후 재발급하세요.
-
-## Troubleshooting
-
-- `401 Unauthorized`로 `auth-config` 다운로드 실패 시: `docs/GITHUB_PACKAGES_TROUBLESHOOTING.md`
