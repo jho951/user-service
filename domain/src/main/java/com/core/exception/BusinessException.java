@@ -28,6 +28,11 @@ public class BusinessException extends RuntimeException {
 		this.errorCode = errorCode;
 	}
 
+	/**
+	 * 예외에 매핑된 에러 코드를 반환합니다.
+	 *
+	 * @return 에러 코드
+	 */
 	public ErrorCode getErrorCode() {
 		return errorCode;
 	}

@@ -1,7 +1,6 @@
 # User Service
 
-`User-server`는 사용자 도메인의 기준 시스템으로 동작하는 멀티모듈 백엔드입니다.
-현재 구조는 `auth-service`와 책임을 분리한 `user-service` 방향으로 정리되어 있습니다.
+>사용자 도메인의 기준 시스템으로 동작하는 멀티모듈 백엔드입니다.
 
 ## Modules
 

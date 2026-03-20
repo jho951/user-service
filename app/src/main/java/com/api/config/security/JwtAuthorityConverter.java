@@ -33,6 +33,12 @@ public class JwtAuthorityConverter implements Converter<Jwt, Collection<GrantedA
 		return authorities;
 	}
 
+	/**
+	 * role 및 roles claim을 Spring Security 권한으로 추가합니다.
+	 *
+	 * @param jwt JWT 토큰
+	 * @param authorities 권한 누적 컬렉션
+	 */
 	private void addRoleAuthorities(Jwt jwt, Set<GrantedAuthority> authorities) {
 		Object roleClaim = jwt.getClaims().get("role");
 		if (roleClaim instanceof String role && !role.isBlank()) {
@@ -49,6 +55,12 @@ public class JwtAuthorityConverter implements Converter<Jwt, Collection<GrantedA
 		}
 	}
 
+	/**
+	 * scope 및 scp claim을 Spring Security 권한으로 추가합니다.
+	 *
+	 * @param jwt JWT 토큰
+	 * @param authorities 권한 누적 컬렉션
+	 */
 	private void addScopeAuthorities(Jwt jwt, Set<GrantedAuthority> authorities) {
 		Object scopeClaim = jwt.getClaims().get("scope");
 		if (scopeClaim instanceof String scope && !scope.isBlank()) {
@@ -70,6 +82,12 @@ public class JwtAuthorityConverter implements Converter<Jwt, Collection<GrantedA
 		}
 	}
 
+	/**
+	 * role 문자열을 Spring Security 권한 객체로 변환합니다.
+	 *
+	 * @param role role 또는 authority 문자열
+	 * @return 변환된 권한 객체
+	 */
 	private GrantedAuthority toGrantedAuthority(String role) {
 		return new SimpleGrantedAuthority(UserRole.from(role).authority());
 	}

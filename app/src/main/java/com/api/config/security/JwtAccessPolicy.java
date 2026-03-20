@@ -14,6 +14,11 @@ public class JwtAccessPolicy {
 
 	private final JwtSecurityProperties properties;
 
+	/**
+	 * JWT 접근 정책 검사기를 생성합니다.
+	 *
+	 * @param properties JWT 보안 설정
+	 */
 	public JwtAccessPolicy(JwtSecurityProperties properties) {
 		this.properties = properties;
 	}

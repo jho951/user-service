@@ -37,6 +37,11 @@ public class InternalUserController {
 
 	private final UserService userService;
 
+	/**
+	 * 내부 사용자 API 컨트롤러를 생성합니다.
+	 *
+	 * @param userService 사용자 서비스
+	 */
 	public InternalUserController(UserService userService) {
 		this.userService = userService;
 	}

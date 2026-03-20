@@ -31,6 +31,11 @@ public class UserController {
 
 	private final UserService userService;
 
+	/**
+	 * 공개 사용자 API 컨트롤러를 생성합니다.
+	 *
+	 * @param userService 사용자 서비스
+	 */
 	public UserController(UserService userService) {
 		this.userService = userService;
 	}

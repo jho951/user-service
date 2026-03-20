@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 /**
  * API 전역 예외를 공통 응답 형식으로 변환하는 핸들러입니다.
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GlobalResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		ErrorCode errorCode = ErrorCode.BAD_REQUEST;
+		ErrorCode errorCode = ErrorCode.VALIDATION_ERROR;
 		String message = e.getBindingResult().getFieldErrors().stream()
 			.findFirst()
 			.map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
@@ -46,6 +47,22 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(errorCode.getHttpStatus())
 			.body(GlobalResponse.fail(errorCode, message));
+	}
+
+	/**
+	 * 허용되지 않은 HTTP 메서드 예외를 처리합니다.
+	 *
+	 * @param e HTTP 메서드 예외
+	 * @return 에러 응답
+	 */
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public ResponseEntity<GlobalResponse<Void>> handleHttpRequestMethodNotSupportedException(
+		HttpRequestMethodNotSupportedException e
+	) {
+		ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
+		return ResponseEntity
+			.status(errorCode.getHttpStatus())
+			.body(GlobalResponse.fail(errorCode));
 	}
 
 	/**

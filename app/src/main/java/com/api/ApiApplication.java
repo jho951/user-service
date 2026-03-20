@@ -8,6 +8,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 @SpringBootApplication
 public class ApiApplication {
+
+	/**
+	 * Spring Boot 애플리케이션을 실행합니다.
+	 *
+	 * @param args 실행 인자
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(ApiApplication.class, args);
 	}

@@ -27,6 +27,12 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final UserSocialRepository userSocialRepository;
 
+	/**
+	 * 사용자 서비스 구현체를 생성합니다.
+	 *
+	 * @param userRepository 사용자 저장소
+	 * @param userSocialRepository 사용자 소셜 계정 저장소
+	 */
 	public UserServiceImpl(UserRepository userRepository, UserSocialRepository userSocialRepository) {
 		this.userRepository = userRepository;
 		this.userSocialRepository = userSocialRepository;
@@ -140,6 +146,14 @@ public class UserServiceImpl implements UserService {
 		return get(userSocial.getUser().getId());
 	}
 
+	/**
+	 * 이메일 중복을 확인한 뒤 사용자를 저장합니다.
+	 *
+	 * @param email 사용자 이메일
+	 * @param role 사용자 권한
+	 * @param status 사용자 상태
+	 * @return 저장된 사용자 엔티티
+	 */
 	private User saveUser(String email, UserRole role, UserStatus status) {
 		if (userRepository.existsByEmail(email)) {
 			throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -154,11 +168,23 @@ public class UserServiceImpl implements UserService {
 		return userRepository.save(user);
 	}
 
+	/**
+	 * 사용자 식별자로 엔티티를 조회합니다.
+	 *
+	 * @param userId 사용자 식별자
+	 * @return 조회된 사용자 엔티티
+	 */
 	private User getUserEntity(UUID userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 	}
 
+	/**
+	 * 소셜 계정 목록을 함께 로딩하여 사용자 엔티티를 조회합니다.
+	 *
+	 * @param userId 사용자 식별자
+	 * @return 소셜 계정이 포함된 사용자 엔티티
+	 */
 	private User getUserEntityWithSocials(UUID userId) {
 		return userRepository.findWithUserSocialListById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
