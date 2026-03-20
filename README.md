@@ -42,6 +42,11 @@ export USER_SERVICE_BASE_URL=http://localhost:8082
 
 분리된 `user-service` 성격의 API가 추가되어 있습니다.
 
+기본 기능 플래그:
+
+- `features.public-user-api.enabled=false`
+- `features.internal-user-api.enabled=true`
+
 - `GET /api/users/me`
 - `POST /api/users/signup`
 - `POST /internal/users`
@@ -49,7 +54,12 @@ export USER_SERVICE_BASE_URL=http://localhost:8082
 - `PATCH /internal/users/{userId}/status`
 - `GET /internal/users/{userId}`
 - `GET /internal/users/by-email?email=...`
-- `GET /internal/users/by-social?provider=GOOGLE&providerUserKey=...`
+- `GET /internal/users/by-social?socialType=GOOGLE&providerId=...`
+
+주의:
+
+- 공개 API인 `/api/users/**` 는 기본 설정에서는 비활성화되어 있습니다.
+- 내부 API인 `/internal/users/**` 는 기본 설정에서 활성화되어 있습니다.
 
 일반 회원 데이터는 `users`, `user_social_accounts` 테이블에 저장됩니다.
 비밀번호 저장 책임은 이 서버가 아닌 `auth-service`로 분리하는 것을 전제로 합니다.
@@ -58,8 +68,8 @@ export USER_SERVICE_BASE_URL=http://localhost:8082
 
 `user-service`는 `auth-service`가 발급한 JWT를 직접 검증합니다.
 
-- 공개 API: `POST /api/users/signup`
-- 보호 API: `GET /api/users/me`
+- 공개 API: `POST /api/users/signup` (`features.public-user-api.enabled=true` 일 때만 노출)
+- 보호 API: `GET /api/users/me` (`features.public-user-api.enabled=true` 일 때만 노출)
 - 내부 API: `/internal/users/**`
 
 기본 개발 설정:
@@ -75,6 +85,7 @@ export USER_SERVICE_BASE_URL=http://localhost:8082
 
 - `/api/users/me`는 인증된 사용자 토큰이면서 `status=ACTIVE`일 때만 허용됩니다.
 - `/internal/users/**`는 `scope` 또는 `scp` claim에 `internal`이 포함된 서비스 토큰만 허용됩니다.
+- JWT 검증 시 `iss`, `aud`, `sub` 존재 여부를 함께 검사합니다.
 
 ## Secret Management
 
