@@ -45,24 +45,7 @@ public enum SuccessCode {
         this.message = message;
     }
 
-    /**
-     * HTTP 상태 코드를 반환합니다.
-     *
-     * @return HTTP 상태 코드
-     */
     public int getHttpStatus() { return httpStatus; }
-
-    /**
-     * 비즈니스 성공 코드를 반환합니다.
-     *
-     * @return 비즈니스 성공 코드
-     */
     public int getCode() { return code; }
-
-    /**
-     * 성공 메시지를 반환합니다.
-     *
-     * @return 성공 메시지
-     */
     public String getMessage() { return message; }
 }

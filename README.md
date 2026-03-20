@@ -33,10 +33,16 @@ export USER_SERVICE_BASE_URL=http://localhost:8082
 2. 빌드/실행
 
 ```bash
-./gradlew clean :app:bootRun
+./scripts/run.local.sh
 ```
 
 기본 프로필은 `dev`이며, 서버는 `http://localhost:8082`으로 실행됩니다.
+
+Docker로 실행하려면 아래 스크립트를 사용합니다.
+
+```bash
+./scripts/run.docker.sh
+```
 
 ## User APIs
 

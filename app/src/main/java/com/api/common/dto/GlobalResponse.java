@@ -95,47 +95,18 @@ public final class GlobalResponse<T> {
         );
     }
 
-    /**
-     * HTTP 상태 코드를 반환합니다.
-     *
-     * @return HTTP 상태 코드
-     */
     public int getHttpStatus() {
         return httpStatus;
     }
-
-    /**
-     * 성공 여부를 반환합니다.
-     *
-     * @return 성공 여부
-     */
     public boolean isSuccess() {
         return success;
     }
-
-    /**
-     * 응답 메시지를 반환합니다.
-     *
-     * @return 응답 메시지
-     */
     public String getMessage() {
         return message;
     }
-
-    /**
-     * 비즈니스 코드를 반환합니다.
-     *
-     * @return 비즈니스 코드
-     */
     public int getCode() {
         return code;
     }
-
-    /**
-     * 응답 데이터를 반환합니다.
-     *
-     * @return 응답 데이터
-     */
     public T getData() {
         return data;
     }
