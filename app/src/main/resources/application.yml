@@ -11,7 +11,7 @@ features:
 security:
   jwt:
     enabled: true
-    issuer: ${AUTH_JWT_ISSUER:auth-service}
-    secret: ${AUTH_JWT_SECRET:abcdefghijklmnopqrstuvwxyz12345678901234567890}
-    audience: ${AUTH_JWT_AUDIENCE:user-service}
-    internal-scope: ${AUTH_INTERNAL_SCOPE:internal}
+    issuer: ${USER_SERVICE_INTERNAL_JWT_ISSUER:${AUTH_JWT_ISSUER:}}
+    secret: ${USER_SERVICE_INTERNAL_JWT_SECRET:${AUTH_JWT_SECRET:}}
+    audience: ${USER_SERVICE_INTERNAL_JWT_AUDIENCE:${AUTH_JWT_AUDIENCE:}}
+    internal-scope: ${USER_SERVICE_INTERNAL_JWT_SCOPE:${AUTH_INTERNAL_SCOPE:internal}}

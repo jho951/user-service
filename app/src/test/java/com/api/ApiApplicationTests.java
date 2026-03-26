@@ -6,7 +6,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * Spring 컨텍스트 로딩 테스트입니다.
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+	"USER_SERVICE_BASE_URL=http://localhost:8082",
+	"USER_SERVICE_INTERNAL_JWT_ISSUER=auth-service",
+	"USER_SERVICE_INTERNAL_JWT_AUDIENCE=user-service",
+	"USER_SERVICE_INTERNAL_JWT_SECRET=abcdefghijklmnopqrstuvwxyz12345678901234567890"
+})
 class ApiApplicationTests {
 
 	/**
