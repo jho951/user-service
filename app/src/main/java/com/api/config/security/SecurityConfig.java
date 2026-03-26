@@ -63,7 +63,6 @@ public class SecurityConfig {
 			.formLogin(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/h2-console/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
 				.requestMatchers("/internal/users/**").access(
 					(authentication, context) -> new org.springframework.security.authorization.AuthorizationDecision(

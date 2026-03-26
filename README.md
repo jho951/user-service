@@ -12,7 +12,7 @@
 - Java 17
 - Spring Boot 3.3.5
 - Spring Data JPA, Spring Security, Validation
-- H2 (dev)
+- MySQL 8.x
 - Gradle 9.x
 
 ## Prerequisites
@@ -24,11 +24,12 @@
 1. 환경 변수 설정
 
 ```bash
-export USER_SERVICE_BASE_URL=http://localhost:8082
+export SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/user_service?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
+export SPRING_DATASOURCE_USERNAME=user_service
+export SPRING_DATASOURCE_PASSWORD=user_service
 ```
 
-`USER_SERVICE_BASE_URL`은 서비스 분리 환경에서 user-service의 기준 URL입니다.
-기본값은 `http://localhost:8082`입니다.
+로컬 실행 시 MySQL이 먼저 떠 있어야 합니다.
 
 2. 빌드/실행
 
@@ -41,8 +42,19 @@ export USER_SERVICE_BASE_URL=http://localhost:8082
 Docker로 실행하려면 아래 스크립트를 사용합니다.
 
 ```bash
-./scripts/run.docker.sh
+./scripts/run.docker.sh dev
+./scripts/run.docker.sh prod
 ```
+
+Docker 실행 시 각 환경별 compose가 `mysql` 컨테이너와 `user-server`를 함께 기동합니다.
+
+- 개발: `docker/docker-compose.dev.yml`
+- 운영: `docker/docker-compose.prod.yml`
+
+MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리로 분리되어 있습니다.
+
+- 개발: `docker/mysql/dev/conf.d/my.cnf`
+- 운영: `docker/mysql/prod/conf.d/my.cnf`
 
 ## User APIs
 
@@ -57,7 +69,7 @@ Docker로 실행하려면 아래 스크립트를 사용합니다.
 - `POST /api/users/signup`
 - `POST /internal/users`
 - `POST /internal/users/social`
-- `PATCH /internal/users/{userId}/status`
+- `PUT /internal/users/{userId}/status`
 - `GET /internal/users/{userId}`
 - `GET /internal/users/by-email?email=...`
 - `GET /internal/users/by-social?socialType=GOOGLE&providerId=...`
@@ -92,6 +104,31 @@ Docker로 실행하려면 아래 스크립트를 사용합니다.
 - `/api/users/me`는 인증된 사용자 토큰이면서 `status=ACTIVE`일 때만 허용됩니다.
 - `/internal/users/**`는 `scope` 또는 `scp` claim에 `internal`이 포함된 서비스 토큰만 허용됩니다.
 - JWT 검증 시 `iss`, `aud`, `sub` 존재 여부를 함께 검사합니다.
+
+## Block Server Alignment
+
+현재 구조 기준으로 블록 서버 연동 시 사용자 식별 계약은 아래와 같습니다.
+
+- 표준 사용자 식별자: `userId`
+- 값 형식: UUID 문자열
+- JWT 사용자 식별자: `sub == userId`
+- 블록 서버 저장 기준: `createdBy`, `updatedBy` 에는 표시명이 아니라 위 UUID 식별자를 저장
+
+현재 `GET /internal/users/{userId}` 응답으로 확인 가능한 기본 정보:
+
+- `id`
+- `email`
+- `role`
+- `status`
+
+현재 상태 정의:
+
+- `ACTIVE`
+- `PENDING`
+- `SUSPENDED`
+- `DELETED`
+
+현재 구조에는 `name`, `displayName` 필드는 없습니다.
 
 ## Secret Management
 

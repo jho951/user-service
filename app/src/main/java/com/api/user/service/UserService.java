@@ -36,6 +36,14 @@ public interface UserService {
 	UserResponse.UserSocialResponse createSocial(UserRequest.UserSocialCreateRequest request);
 
 	/**
+	 * 소셜 사용자 보장 유즈케이스를 처리합니다.
+	 *
+	 * @param request 소셜 사용자 보장 요청
+	 * @return 보장된 사용자 상세 응답
+	 */
+	UserResponse.UserDetailResponse ensureSocial(UserRequest.UserEnsureSocialRequest request);
+
+	/**
 	 * 사용자 상태를 변경합니다.
 	 *
 	 * @param userId 사용자 식별자

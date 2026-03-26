@@ -5,9 +5,9 @@ import java.util.UUID;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -79,13 +79,29 @@ public class InternalUserController {
 	}
 
 	/**
+	 * 소셜 사용자 보장 유즈케이스를 처리합니다.
+	 *
+	 * @param request 소셜 사용자 보장 요청
+	 * @return 보장된 사용자 상세 응답
+	 */
+	@PostMapping("/ensure-social")
+	public ResponseEntity<GlobalResponse<UserResponse.UserDetailResponse>> ensureSocial(
+		@Valid @RequestBody UserRequest.UserEnsureSocialRequest request
+	) {
+		SuccessCode successCode = SuccessCode.USER_ENSURE_SOCIAL_SUCCESS;
+		return ResponseEntity
+			.status(successCode.getHttpStatus())
+			.body(GlobalResponse.ok(successCode, userService.ensureSocial(request)));
+	}
+
+	/**
 	 * 사용자 상태를 변경합니다.
 	 *
 	 * @param userId 사용자 식별자
 	 * @param request 상태 변경 요청
 	 * @return 변경된 사용자 응답
 	 */
-	@PatchMapping("/{userId}/status")
+	@PutMapping("/{userId}/status")
 	public ResponseEntity<GlobalResponse<UserResponse.UserDetailResponse>> updateStatus(
 		@PathVariable UUID userId,
 		@Valid @RequestBody UserRequest.UserStatusUpdateRequest request

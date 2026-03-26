@@ -26,7 +26,10 @@ public enum SuccessCode {
     USER_GET_BY_EMAIL_SUCCESS(200, 3006, "이메일 기준 사용자 조회 성공"),
 
     /** 소셜 계정 기준 사용자 조회 성공 */
-    USER_GET_BY_SOCIAL_SUCCESS(200, 3007, "소셜 계정 기준 사용자 조회 성공");
+    USER_GET_BY_SOCIAL_SUCCESS(200, 3007, "소셜 계정 기준 사용자 조회 성공"),
+
+    /** 소셜 사용자 보장 성공 */
+    USER_ENSURE_SOCIAL_SUCCESS(200, 3008, "소셜 사용자 보장 성공");
 
     private final int httpStatus;
     private final int code;
