@@ -65,6 +65,28 @@ public class UserRequest {
 	}
 
 	/**
+	 * 소셜 사용자 보장 요청 DTO입니다.
+	 */
+	@Getter
+	@NoArgsConstructor(access = AccessLevel.PROTECTED)
+	public static class UserEnsureSocialRequest {
+
+		@Email
+		@NotBlank
+		private String email;
+
+		@NotNull
+		private UserSocialType socialType;
+
+		@NotBlank
+		private String providerId;
+
+		private UserRole role;
+
+		private UserStatus status;
+	}
+
+	/**
 	 * 사용자 상태 변경 요청 DTO입니다.
 	 */
 	@Getter

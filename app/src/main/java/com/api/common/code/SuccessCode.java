@@ -26,7 +26,10 @@ public enum SuccessCode {
     USER_GET_BY_EMAIL_SUCCESS(200, 3006, "이메일 기준 사용자 조회 성공"),
 
     /** 소셜 계정 기준 사용자 조회 성공 */
-    USER_GET_BY_SOCIAL_SUCCESS(200, 3007, "소셜 계정 기준 사용자 조회 성공");
+    USER_GET_BY_SOCIAL_SUCCESS(200, 3007, "소셜 계정 기준 사용자 조회 성공"),
+
+    /** 소셜 사용자 보장 성공 */
+    USER_ENSURE_SOCIAL_SUCCESS(200, 3008, "소셜 사용자 보장 성공");
 
     private final int httpStatus;
     private final int code;
@@ -45,24 +48,7 @@ public enum SuccessCode {
         this.message = message;
     }
 
-    /**
-     * HTTP 상태 코드를 반환합니다.
-     *
-     * @return HTTP 상태 코드
-     */
     public int getHttpStatus() { return httpStatus; }
-
-    /**
-     * 비즈니스 성공 코드를 반환합니다.
-     *
-     * @return 비즈니스 성공 코드
-     */
     public int getCode() { return code; }
-
-    /**
-     * 성공 메시지를 반환합니다.
-     *
-     * @return 성공 메시지
-     */
     public String getMessage() { return message; }
 }

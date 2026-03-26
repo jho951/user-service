@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: user-server-mysql-prod
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-user_service}
+      MYSQL_USER: ${MYSQL_USER:-user_service}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-user_service}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change-me}
+      TZ: ${TZ:-Asia/Seoul}
+    expose:
+      - "3306"
+    volumes:
+      - user_server_mysql_prod_data:/var/lib/mysql
+      - ./mysql/prod/conf.d:/etc/mysql/conf.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-change-me}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  user-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: docker-user-service:prod
+    container_name: user-server-prod
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8082}:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/user_service?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-user_service}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-user_service}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:-abcdefghijklmnopqrstuvwxyz12345678901234567890}
+      FEATURES_PUBLIC_USER_API_ENABLED: ${FEATURES_PUBLIC_USER_API_ENABLED:-false}
+      FEATURES_INTERNAL_USER_API_ENABLED: ${FEATURES_INTERNAL_USER_API_ENABLED:-true}
+      FEATURES_ADMIN_API_ENABLED: ${FEATURES_ADMIN_API_ENABLED:-false}
+      FEATURES_ADMIN_AUTH_ENABLED: ${FEATURES_ADMIN_AUTH_ENABLED:-false}
+      TZ: ${TZ:-Asia/Seoul}
+    restart: unless-stopped
+
+volumes:
+  user_server_mysql_prod_data:

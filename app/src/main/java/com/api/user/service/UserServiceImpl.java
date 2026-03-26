@@ -93,6 +93,42 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	/**
+	 * 소셜 사용자 보장 유즈케이스를 처리합니다.
+	 *
+	 * @param request 소셜 사용자 보장 요청
+	 * @return 보장된 사용자 상세 응답
+	 */
+	public UserResponse.UserDetailResponse ensureSocial(UserRequest.UserEnsureSocialRequest request) {
+		UserSocial existingSocial = userSocialRepository
+			.findBySocialTypeAndProviderId(request.getSocialType(), request.getProviderId())
+			.orElse(null);
+		if (existingSocial != null) {
+			return get(existingSocial.getUser().getId());
+		}
+
+		User user = userRepository.findWithUserSocialListByEmail(request.getEmail())
+			.orElseGet(() -> userRepository.save(
+				User.builder()
+					.email(request.getEmail())
+					.role(request.getRole() != null ? request.getRole() : UserRole.USER)
+					.status(request.getStatus() != null ? request.getStatus() : UserStatus.ACTIVE)
+					.build()
+			));
+
+		UserSocial userSocial = UserSocial.builder()
+			.user(user)
+			.socialType(request.getSocialType())
+			.providerId(request.getProviderId())
+			.build();
+
+		UserSocial savedUserSocial = userSocialRepository.save(userSocial);
+		user.addUserSocial(savedUserSocial);
+
+		return get(user.getId());
+	}
+
+	@Override
+	/**
 	 * 사용자 상태를 변경합니다.
 	 *
 	 * @param userId 사용자 식별자
