@@ -25,10 +25,22 @@
 
 ```bash
 export USER_SERVICE_BASE_URL=http://localhost:8082
+export USER_SERVICE_INTERNAL_JWT_ISSUER=auth-service
+export USER_SERVICE_INTERNAL_JWT_AUDIENCE=user-service
+export USER_SERVICE_INTERNAL_JWT_SECRET=<shared-hmac-secret>
+# optional
+export USER_SERVICE_INTERNAL_JWT_SCOPE=internal
 ```
 
-`USER_SERVICE_BASE_URL`은 서비스 분리 환경에서 user-service의 기준 URL입니다.
-기본값은 `http://localhost:8082`입니다.
+`RemoteUserDirectory`를 사용하는 `auth-server` 연동을 위해 아래 값은 반드시 채워야 합니다.
+
+- `USER_SERVICE_BASE_URL`: auth-server가 호출할 user-service 주소
+- `USER_SERVICE_INTERNAL_JWT_ISSUER`: 내부 JWT `iss`
+- `USER_SERVICE_INTERNAL_JWT_AUDIENCE`: 내부 JWT `aud`
+- `USER_SERVICE_INTERNAL_JWT_SECRET`: 내부 JWT HMAC 비밀키
+- `USER_SERVICE_INTERNAL_JWT_SCOPE`(선택): 내부 호출 scope (기본값 `internal`)
+
+호환성을 위해 기존 `AUTH_JWT_*` 환경변수도 계속 읽지만, 서비스 간 설정 일치를 위해 `USER_SERVICE_INTERNAL_JWT_*` 사용을 권장합니다.
 
 2. 빌드/실행
 
@@ -72,12 +84,19 @@ export USER_SERVICE_BASE_URL=http://localhost:8082
 - 보호 API: `GET /api/users/me` (`features.public-user-api.enabled=true` 일 때만 노출)
 - 내부 API: `/internal/users/**`
 
-기본 개발 설정:
+기본 개발 설정(권장):
 
-- `AUTH_JWT_ISSUER=auth-service`
-- `AUTH_JWT_SECRET=<shared-hmac-secret>`
-- `AUTH_JWT_AUDIENCE=user-service`
-- `AUTH_INTERNAL_SCOPE=internal`
+- `USER_SERVICE_INTERNAL_JWT_ISSUER=auth-service`
+- `USER_SERVICE_INTERNAL_JWT_SECRET=<shared-hmac-secret>`
+- `USER_SERVICE_INTERNAL_JWT_AUDIENCE=user-service`
+- `USER_SERVICE_INTERNAL_JWT_SCOPE=internal`
+
+호환 별칭:
+
+- `AUTH_JWT_ISSUER`
+- `AUTH_JWT_SECRET`
+- `AUTH_JWT_AUDIENCE`
+- `AUTH_INTERNAL_SCOPE`
 
 현재 구현은 HMAC 서명 JWT를 기준으로 동작합니다. 운영 환경에서는 `auth-service`의 실제 서명 정책에 맞춰 키 관리나 JWK 기반 검증으로 전환하는 것이 바람직합니다.
 
