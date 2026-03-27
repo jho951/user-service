@@ -87,8 +87,8 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 - `features.public-user-api.enabled=false`
 - `features.internal-user-api.enabled=true`
 
-- `GET /api/users/me`
-- `POST /api/users/signup`
+- `GET /users/me`
+- `POST /users/signup`
 - `POST /internal/users`
 - `POST /internal/users/social`
 - `PUT /internal/users/{userId}/status`
@@ -96,9 +96,15 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 - `GET /internal/users/by-email?email=...`
 - `GET /internal/users/by-social?socialType=GOOGLE&providerId=...`
 
+Gateway 버저닝 정책:
+
+- 외부(클라이언트) 계약은 gateway에서 `/v1/...` 로 노출합니다.
+- 내부(서비스 간) 계약은 gateway rewrite로 `/v1`을 제거해 user-service에 전달합니다.
+- 따라서 user-service는 버전 prefix 없는 경로(`/users/**`, `/internal/users/**`)만 운영합니다.
+
 주의:
 
-- 공개 API인 `/api/users/**` 는 기본 설정에서는 비활성화되어 있습니다.
+- 공개 API인 `/users/**` 는 기본 설정에서는 비활성화되어 있습니다.
 - 내부 API인 `/internal/users/**` 는 기본 설정에서 활성화되어 있습니다.
 
 일반 회원 데이터는 `users`, `user_social_accounts` 테이블에 저장됩니다.
@@ -108,8 +114,8 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 
 `user-service`는 `auth-service`가 발급한 JWT를 직접 검증합니다.
 
-- 공개 API: `POST /api/users/signup` (`features.public-user-api.enabled=true` 일 때만 노출)
-- 보호 API: `GET /api/users/me` (`features.public-user-api.enabled=true` 일 때만 노출)
+- 공개 API: `POST /users/signup` (`features.public-user-api.enabled=true` 일 때만 노출)
+- 보호 API: `GET /users/me` (`features.public-user-api.enabled=true` 일 때만 노출)
 - 내부 API: `/internal/users/**`
 
 기본 개발 설정(권장):
@@ -130,7 +136,7 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 
 추가 정책:
 
-- `/api/users/me`는 인증된 사용자 토큰이면서 `status=ACTIVE`일 때만 허용됩니다.
+- `/users/me`는 인증된 사용자 토큰이면서 `status=ACTIVE`일 때만 허용됩니다.
 - `/internal/users/**`는 `scope` 또는 `scp` claim에 `internal`이 포함된 서비스 토큰만 허용됩니다.
 - JWT 검증 시 `iss`, `aud`, `sub` 존재 여부를 함께 검사합니다.
 

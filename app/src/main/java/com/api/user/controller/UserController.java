@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
  * 공개 사용자 API를 제공합니다.
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @ConditionalOnProperty(prefix = "features.public-user-api", name = "enabled", havingValue = "true")
 public class UserController {
 
