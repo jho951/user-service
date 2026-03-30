@@ -8,10 +8,10 @@ PROFILE="${1:-dev}"
 SHARED_SERVICE_NETWORK="${SHARED_SERVICE_NETWORK:-${BACKEND_SHARED_NETWORK:-${MSA_SHARED_NETWORK:-service-backbone-shared}}}"
 
 case "${PROFILE}" in
-  dev|prod)
+  dev)
     ;;
   *)
-    echo "Usage: $0 [dev|prod]" >&2
+    echo "Usage: $0 [dev]" >&2
     exit 1
     ;;
 esac
@@ -23,4 +23,4 @@ if ! docker network inspect "${SHARED_SERVICE_NETWORK}" >/dev/null 2>&1; then
   docker network create "${SHARED_SERVICE_NETWORK}" >/dev/null
 fi
 
-SHARED_SERVICE_NETWORK="${SHARED_SERVICE_NETWORK}" docker compose -f "docker-compose.yml" --profile "${PROFILE}" up --build -d
+SHARED_SERVICE_NETWORK="${SHARED_SERVICE_NETWORK}" docker compose -f "docker-compose.yml" up --build -d

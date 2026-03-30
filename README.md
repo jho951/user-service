@@ -70,29 +70,21 @@ export USER_SERVICE_INTERNAL_JWT_SCOPE=internal
 Docker로 실행하려면 아래 스크립트를 사용합니다.
 
 ```bash
-# optional: 공유 백엔드 네트워크 이름 커스터마이징
-# export SHARED_SERVICE_NETWORK=service-backbone-shared
-# export BACKEND_SHARED_NETWORK=service-backbone-shared
-# (하위 호환) export MSA_SHARED_NETWORK=...
-
 ./scripts/run.docker.sh dev
-./scripts/run.docker.sh prod
 ```
 
-Docker 실행 시 단일 compose 스택(`docker/docker-compose.yml`)에서 profile별로 서비스를 분리해 기동합니다.
+Docker 실행 시 단일 compose 스택(`docker/docker-compose.yml`)에서 `dev` 환경만 기동합니다.
 
-- 개발 profile: `mysql-dev`, `user-service-dev`
-- 운영 profile: `mysql-prod`, `user-service-prod`
+- 개발 스택: `mysql`, `user-service`
 
 네트워크 구성:
 
 - `service-backbone-shared`(external): gateway/auth/user-service 간 통신용 공유 네트워크
-- `user-private`(internal): user-service와 user-service DB 전용 내부 네트워크
+- `user-private`(internal): user-service와 MySQL 전용 내부 네트워크
 
 MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리로 분리되어 있습니다.
 
 - 개발: `docker/mysql/dev/conf.d/my.cnf`
-- 운영: `docker/mysql/prod/conf.d/my.cnf`
 
 ## User APIs
 
@@ -160,10 +152,10 @@ Docker 로그 확인:
 
 ```bash
 # user-service 애플리케이션 로그 (gateway 경유 접근 + SQL 포함)
-docker compose -f docker/docker-compose.yml --profile dev logs -f user-service-dev
+docker compose -f docker/docker-compose.yml logs -f user-service
 
 # MySQL 로그
-docker compose -f docker/docker-compose.yml --profile dev logs -f mysql-dev
+docker compose -f docker/docker-compose.yml logs -f mysql
 ```
 
 로그 성격:
@@ -176,7 +168,7 @@ docker compose -f docker/docker-compose.yml --profile dev logs -f mysql-dev
 ```bash
 export LOGGING_LEVEL_ORG_HIBERNATE_SQL=DEBUG
 export LOGGING_LEVEL_ORG_HIBERNATE_BIND=TRACE
-./scripts/run.docker.sh prod
+./scripts/run.docker.sh dev
 ```
 
 Gateway 버저닝 정책:
