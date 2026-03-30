@@ -67,6 +67,7 @@ public class SecurityConfig {
 	) throws Exception {
 		http
 			.securityMatcher("/internal/**")
+			.cors(AbstractHttpConfigurer::disable)
 			.csrf(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
@@ -113,6 +114,7 @@ public class SecurityConfig {
 	) throws Exception {
 		http
 			.securityMatcher("/users/**")
+			.cors(AbstractHttpConfigurer::disable)
 			.csrf(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
@@ -144,6 +146,7 @@ public class SecurityConfig {
 	 */
 	public SecurityFilterChain defaultDenySecurityFilterChain(HttpSecurity http) throws Exception {
 		http
+			.cors(AbstractHttpConfigurer::disable)
 			.csrf(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)

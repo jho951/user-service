@@ -70,8 +70,10 @@ export USER_SERVICE_INTERNAL_JWT_SCOPE=internal
 Docker로 실행하려면 아래 스크립트를 사용합니다.
 
 ```bash
-# optional: 공유 MSA 네트워크 이름 커스터마이징
-# export MSA_SHARED_NETWORK=msa-shared
+# optional: 공유 백엔드 네트워크 이름 커스터마이징
+# export SHARED_SERVICE_NETWORK=service-backbone-shared
+# export BACKEND_SHARED_NETWORK=service-backbone-shared
+# (하위 호환) export MSA_SHARED_NETWORK=...
 
 ./scripts/run.docker.sh dev
 ./scripts/run.docker.sh prod
@@ -84,7 +86,7 @@ Docker 실행 시 각 환경별 compose가 `mysql` 컨테이너와 `user-server`
 
 네트워크 구성:
 
-- `msa-shared`(external): gateway/auth/user-service 간 통신용 공유 네트워크
+- `service-backbone-shared`(external): gateway/auth/user-service 간 통신용 공유 네트워크
 - `user-private`(internal): user-service와 user-service DB 전용 내부 네트워크
 
 MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리로 분리되어 있습니다.
@@ -98,7 +100,7 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 
 기본 기능 플래그:
 
-- `features.public-user-api.enabled=false`
+- `features.public-user-api.enabled=true`
 - `features.internal-user-api.enabled=true`
 
 - `GET /users/me`
@@ -113,8 +115,8 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 
 - 소셜 링크 원본 필드: `provider`, `providerUserId`, `email`, `userId`
 - 요청 본문은 `provider`/`providerUserId`를 권장하며, 하위 호환으로 `socialType`/`providerId`도 허용합니다.
-- 소셜 링크 생성/조회의 단일 진입점: `POST /internal/users/find-or-create-and-link-social`
-- `POST /internal/users/social`, `POST /internal/users/ensure-social`, `GET /internal/users/by-social`는 비활성 정책이며 `400`을 반환합니다.
+- 소셜 링크 생성/조회의 표준 진입점: `POST /internal/users/find-or-create-and-link-social`
+- `POST /internal/users/social`, `POST /internal/users/ensure-social`, `GET /internal/users/by-social`는 auth-service(main) 호환을 위해 유지되며, 신규 연동은 `find-or-create-and-link-social` 사용을 권장합니다.
 
 필수 관측 지표:
 
@@ -185,7 +187,7 @@ Gateway 버저닝 정책:
 
 주의:
 
-- 공개 API인 `/users/**` 는 기본 설정에서는 비활성화되어 있습니다.
+- 공개 API인 `/users/**` 는 기본 설정에서 활성화되어 있습니다.
 - 내부 API인 `/internal/users/**` 는 기본 설정에서 활성화되어 있습니다.
 
 일반 회원 데이터는 `users`, `user_social_accounts` 테이블에 저장됩니다.

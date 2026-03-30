@@ -91,10 +91,9 @@ public class UserServiceImpl implements UserService {
 	 * @return 생성된 소셜 계정 응답
 	 */
 	public UserResponse.UserSocialResponse createSocial(UserRequest.UserSocialCreateRequest request) {
-		throw new BusinessException(
-			ErrorCode.BAD_REQUEST,
-			"Use /internal/users/find-or-create-and-link-social as the single social link entrypoint."
-		);
+		User user = getUserEntity(request.getUserId());
+		LinkResult linkResult = linkSocialIdempotently(user, request.getSocialType(), request.getProviderId(), null);
+		return UserResponse.UserSocialResponse.from(linkResult.userSocial);
 	}
 
 	@Override
@@ -105,10 +104,7 @@ public class UserServiceImpl implements UserService {
 	 * @return 보장된 사용자 상세 응답
 	 */
 	public UserResponse.UserDetailResponse ensureSocial(UserRequest.UserEnsureSocialRequest request) {
-		throw new BusinessException(
-			ErrorCode.BAD_REQUEST,
-			"Use /internal/users/find-or-create-and-link-social as the single social link entrypoint."
-		);
+		return findOrCreateAndLinkSocial(request);
 	}
 
 	@Override
@@ -252,10 +248,9 @@ public class UserServiceImpl implements UserService {
 	 * @return 사용자 상세 응답
 	 */
 	public UserResponse.UserDetailResponse getBySocial(UserSocialType socialType, String providerId) {
-		throw new BusinessException(
-			ErrorCode.BAD_REQUEST,
-			"Use /internal/users/find-or-create-and-link-social as the single social link entrypoint."
-		);
+		UserSocial userSocial = userSocialRepository.findBySocialTypeAndProviderId(socialType, providerId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+		return get(userSocial.getUser().getId());
 	}
 
 	/**
