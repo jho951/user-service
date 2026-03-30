@@ -2,6 +2,12 @@
 
 >사용자 도메인의 기준 시스템으로 동작하는 멀티모듈 백엔드입니다.
 
+## Contract Source
+
+- 공통 계약 레포: `https://github.com/jho951/contract`
+- 이 서비스의 코드 SoT: `User-server` `main`
+- 인터페이스 변경 시 본 저장소 구현보다 계약 레포 변경을 먼저 반영합니다.
+
 ## Modules
 
 - `app`: Spring Boot 실행 모듈, 일반 회원/내부 연동 API
