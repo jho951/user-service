@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletResponse;
 public class RequestAccessLogFilter extends OncePerRequestFilter {
 
 	private static final Logger log = LoggerFactory.getLogger(RequestAccessLogFilter.class);
+	private static final String HEADER_REQUEST_ID = "X-Request-Id";
+	private static final String HEADER_CORRELATION_ID = "X-Correlation-Id";
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -30,20 +32,31 @@ public class RequestAccessLogFilter extends OncePerRequestFilter {
 		FilterChain filterChain
 	) throws ServletException, IOException {
 		long startedAt = System.currentTimeMillis();
+		String requestId = request.getHeader(HEADER_REQUEST_ID);
+		String correlationId = request.getHeader(HEADER_CORRELATION_ID);
+
+		// gateway가 전달한 추적 헤더를 downstream 응답에도 유지해 트레이싱 경로를 고정합니다.
+		if (requestId != null && !requestId.isBlank()) {
+			response.setHeader(HEADER_REQUEST_ID, requestId);
+		}
+		if (correlationId != null && !correlationId.isBlank()) {
+			response.setHeader(HEADER_CORRELATION_ID, correlationId);
+		}
 
 		try {
 			filterChain.doFilter(request, response);
 		} finally {
 			long elapsed = System.currentTimeMillis() - startedAt;
 			log.info(
-				"http_access method={} path={} query={} status={} durationMs={} forwardedFor={} requestId={} gatewayUserId={}",
+				"http_access method={} path={} query={} status={} durationMs={} forwardedFor={} requestId={} correlationId={} gatewayUserId={}",
 				request.getMethod(),
 				request.getRequestURI(),
 				request.getQueryString(),
 				response.getStatus(),
 				elapsed,
 				request.getHeader("X-Forwarded-For"),
-				request.getHeader("X-Request-Id"),
+				requestId,
+				correlationId,
 				request.getHeader("X-User-Id")
 			);
 		}

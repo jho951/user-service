@@ -1,8 +1,6 @@
 package com.core.exception;
 
-/**
- * 서비스 전반에서 사용하는 표준 에러 코드를 정의합니다.
- */
+/** 서비스 전반에서 사용하는 표준 에러 코드를 정의합니다. */
 public enum ErrorCode {
 
 	// 공통 에러
@@ -30,7 +28,6 @@ public enum ErrorCode {
 
 	/**
 	 * 생성자
-	 *
 	 * @param httpStatus HTTP status code 숫자
 	 * @param code 비즈니스 에러 코드
 	 * @param message 기본 에러 메시지
@@ -41,27 +38,10 @@ public enum ErrorCode {
 		this.message = message;
 	}
 
-	/**
-	 * HTTP 상태 코드를 반환합니다.
-	 *
-	 * @return HTTP 상태 코드
-	 */
 	public int getHttpStatus() {return httpStatus;}
-
-	/**
-	 * 비즈니스 에러 코드를 반환합니다.
-	 *
-	 * @return 비즈니스 에러 코드
-	 */
 	public int getCode() {
 		return code;
 	}
-
-	/**
-	 * 에러 메시지를 반환합니다.
-	 *
-	 * @return 에러 메시지
-	 */
 	public String getMessage() {
 		return message;
 	}

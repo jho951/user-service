@@ -64,21 +64,23 @@ export USER_SERVICE_INTERNAL_JWT_SCOPE=internal
 Docker로 실행하려면 아래 스크립트를 사용합니다.
 
 ```bash
-# optional: 공유 MSA 네트워크 이름 커스터마이징
-# export MSA_SHARED_NETWORK=msa-shared
+# optional: 공유 백엔드 네트워크 이름 커스터마이징
+# export SHARED_SERVICE_NETWORK=service-backbone-shared
+# export BACKEND_SHARED_NETWORK=service-backbone-shared
+# (하위 호환) export MSA_SHARED_NETWORK=...
 
 ./scripts/run.docker.sh dev
 ./scripts/run.docker.sh prod
 ```
 
-Docker 실행 시 각 환경별 compose가 `mysql` 컨테이너와 `user-server`를 함께 기동합니다.
+Docker 실행 시 단일 compose 스택(`docker/docker-compose.yml`)에서 profile별로 서비스를 분리해 기동합니다.
 
-- 개발: `docker/docker-compose.dev.yml`
-- 운영: `docker/docker-compose.prod.yml`
+- 개발 profile: `mysql-dev`, `user-service-dev`
+- 운영 profile: `mysql-prod`, `user-service-prod`
 
 네트워크 구성:
 
-- `msa-shared`(external): gateway/auth/user-service 간 통신용 공유 네트워크
+- `service-backbone-shared`(external): gateway/auth/user-service 간 통신용 공유 네트워크
 - `user-private`(internal): user-service와 user-service DB 전용 내부 네트워크
 
 MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리로 분리되어 있습니다.
@@ -92,7 +94,7 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 
 기본 기능 플래그:
 
-- `features.public-user-api.enabled=false`
+- `features.public-user-api.enabled=true`
 - `features.internal-user-api.enabled=true`
 
 - `GET /users/me`
@@ -107,8 +109,8 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 
 - 소셜 링크 원본 필드: `provider`, `providerUserId`, `email`, `userId`
 - 요청 본문은 `provider`/`providerUserId`를 권장하며, 하위 호환으로 `socialType`/`providerId`도 허용합니다.
-- 소셜 링크 생성/조회의 단일 진입점: `POST /internal/users/find-or-create-and-link-social`
-- `POST /internal/users/social`, `POST /internal/users/ensure-social`, `GET /internal/users/by-social`는 비활성 정책이며 `400`을 반환합니다.
+- 소셜 링크 생성/조회의 표준 진입점: `POST /internal/users/find-or-create-and-link-social`
+- `POST /internal/users/social`, `POST /internal/users/ensure-social`, `GET /internal/users/by-social`는 auth-service(main) 호환을 위해 유지되며, 신규 연동은 `find-or-create-and-link-social` 사용을 권장합니다.
 
 필수 관측 지표:
 
@@ -152,10 +154,10 @@ Docker 로그 확인:
 
 ```bash
 # user-service 애플리케이션 로그 (gateway 경유 접근 + SQL 포함)
-docker logs -f user-server-dev
+docker compose -f docker/docker-compose.yml --profile dev logs -f user-service-dev
 
 # MySQL 로그
-docker logs -f user-server-mysql-dev
+docker compose -f docker/docker-compose.yml --profile dev logs -f mysql-dev
 ```
 
 로그 성격:
@@ -177,9 +179,36 @@ Gateway 버저닝 정책:
 - 내부(서비스 간) 계약은 gateway rewrite로 `/v1`을 제거해 user-service에 전달합니다.
 - 따라서 user-service는 버전 prefix 없는 경로(`/users/**`, `/internal/users/**`)만 운영합니다.
 
+Gateway 연동 계약(고정):
+
+1. 라우트 계약
+   - gateway 매핑 경로와 user-service 실제 엔드포인트를 일치시킵니다.
+   - 핵심 경로: `/v1/users/signup`, `/v1/users/me`, `/v1/internal/users/**`
+2. 업스트림 주소
+   - gateway의 `USER_SERVICE_URL`은 서비스 DNS를 사용합니다.
+   - 권장: `http://user-service:8082`
+3. 경로 재작성(prefix)
+   - gateway는 `/v1` prefix를 strip한 뒤 user-service로 전달합니다.
+   - user-service는 `/users/**`, `/internal/users/**` 기준으로 라우팅합니다.
+4. 인증 헤더 계약
+   - `PROTECTED/ADMIN` 요청은 gateway가 내부 JWT를 `Authorization`으로 전달합니다.
+   - `/v1/users/me`는 gateway 라우트 타입이 `PUBLIC`이어도 user-service에서 최종 인증을 수행합니다.
+5. INTERNAL 호출 계약
+   - `/v1/internal/users/**`는 gateway에서 `X-Internal-Request-Secret` 검증 후 전달합니다.
+   - user-service는 `/internal/**`를 내부 Bearer JWT + internal scope로만 허용합니다(헤더 시크릿은 gateway 1차 가드).
+6. 추적 헤더 계약
+   - gateway는 `X-Request-Id`, `X-Correlation-Id`를 전달합니다.
+   - user-service는 접근 로그(`http_access`)에 두 헤더를 기록하고 응답 헤더로도 유지합니다.
+7. 에러/타임아웃 정책
+   - gateway timeout은 user-service 처리시간보다 길게 설정합니다.
+   - 502/504는 gateway(user-service upstream)와 user-service 양쪽 알람에서 동시에 추적합니다.
+8. CORS/외부 노출 경계
+   - CORS는 gateway에서 처리합니다.
+   - user-service는 gateway 뒤 내부 서비스 전제로 운영하며, 직접 외부 노출을 지양합니다.
+
 주의:
 
-- 공개 API인 `/users/**` 는 기본 설정에서는 비활성화되어 있습니다.
+- 공개 API인 `/users/**` 는 기본 설정에서 활성화되어 있습니다.
 - 내부 API인 `/internal/users/**` 는 기본 설정에서 활성화되어 있습니다.
 
 일반 회원 데이터는 `users`, `user_social_accounts` 테이블에 저장됩니다.
@@ -218,6 +247,8 @@ Gateway 버저닝 정책:
 - `/users/**`:
   - gateway 사용자 컨텍스트 헤더(`X-User-Id`, `X-User-Status`) 또는 Bearer 사용자 토큰 기준으로 인증 처리
   - `/users/me`는 `status=A`일 때만 허용
+- CORS:
+  - 서비스 레벨 CORS는 비활성화하고 gateway 정책을 단일 진입점으로 사용
 
 ## Block Server Alignment
 
