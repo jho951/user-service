@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AttributeOverride(name = "id", column = @Column(name = "user_id", nullable = false))
+@AttributeOverride(name = "id", column = @Column(name = "user_id", nullable = false, updatable = false, columnDefinition = "char(36)", length = 36))
 public class User extends BaseEntity {
 
 	@Column(nullable = false, unique = true, length = 191)

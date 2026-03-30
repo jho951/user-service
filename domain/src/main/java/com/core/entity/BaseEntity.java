@@ -14,6 +14,8 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * 공통 매핑 정보 추상 클래스
@@ -28,11 +30,12 @@ public abstract class BaseEntity {
 
 	/**
 	 * 엔티티의 고유 식별자입니다.
-	 * UUID 전략으로 생성되며 문자열 형태로 저장됩니다.
+	 * UUID 전략으로 생성되며 CHAR(36) 형태로 저장됩니다.
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(nullable = false, updatable = false, length = 36)
+	@Column(nullable = false, updatable = false, length = 36, columnDefinition = "char(36)")
+	@JdbcTypeCode(SqlTypes.CHAR)
 	private UUID id;
 
 	/**

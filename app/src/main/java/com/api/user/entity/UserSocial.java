@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AttributeOverride(name = "id", column = @Column(name = "user_social_id", nullable = false))
+@AttributeOverride(name = "id", column = @Column(name = "user_social_id", nullable = false, updatable = false, columnDefinition = "char(36)", length = 36))
 public class UserSocial extends BaseEntity {
 
 	@Convert(converter = UserSocialTypeConverter.class)
@@ -49,7 +49,7 @@ public class UserSocial extends BaseEntity {
 	private String email;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "user_id", nullable = false, columnDefinition = "char(36)")
 	private User user;
 
 	/**
