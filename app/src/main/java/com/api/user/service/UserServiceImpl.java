@@ -19,6 +19,7 @@ import com.api.user.dto.UserRequest;
 import com.api.user.dto.UserResponse;
 import com.api.user.entity.User;
 import com.api.user.entity.UserSocial;
+import com.api.user.audit.UserAuditLogService;
 import com.api.user.observability.SocialLinkMetrics;
 import com.api.user.repository.UserRepository;
 import com.api.user.repository.UserSocialRepository;
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final UserSocialRepository userSocialRepository;
 	private final SocialLinkMetrics socialLinkMetrics;
+	private final UserAuditLogService userAuditLogService;
 
 	/**
 	 * 사용자 서비스 구현체를 생성합니다.
@@ -48,11 +50,13 @@ public class UserServiceImpl implements UserService {
 	public UserServiceImpl(
 		UserRepository userRepository,
 		UserSocialRepository userSocialRepository,
-		SocialLinkMetrics socialLinkMetrics
+		SocialLinkMetrics socialLinkMetrics,
+		UserAuditLogService userAuditLogService
 	) {
 		this.userRepository = userRepository;
 		this.userSocialRepository = userSocialRepository;
 		this.socialLinkMetrics = socialLinkMetrics;
+		this.userAuditLogService = userAuditLogService;
 	}
 
 	@Override
@@ -64,6 +68,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	public UserResponse.UserCreateResponse signup(UserRequest.UserSignupRequest request) {
 		User savedUser = saveUser(request.getEmail(), UserRole.USER, UserStatus.ACTIVE);
+		userAuditLogService.logSignup(savedUser);
 		return UserResponse.UserCreateResponse.from(savedUser);
 	}
 
@@ -80,6 +85,7 @@ public class UserServiceImpl implements UserService {
 			request.getRole() != null ? request.getRole() : UserRole.USER,
 			request.getStatus() != null ? request.getStatus() : UserStatus.ACTIVE
 		);
+		userAuditLogService.logInternalCreate(savedUser);
 		return UserResponse.UserDetailResponse.from(savedUser);
 	}
 
@@ -93,6 +99,7 @@ public class UserServiceImpl implements UserService {
 	public UserResponse.UserSocialResponse createSocial(UserRequest.UserSocialCreateRequest request) {
 		User user = getUserEntity(request.getUserId());
 		LinkResult linkResult = linkSocialIdempotently(user, request.getSocialType(), request.getProviderId(), null);
+		userAuditLogService.logSocialLink(linkResult.userSocial, "POST /internal/users/social");
 		return UserResponse.UserSocialResponse.from(linkResult.userSocial);
 	}
 
@@ -128,6 +135,7 @@ public class UserServiceImpl implements UserService {
 				syncLinkedEmail(existingSocial, email);
 				socialLinkMetrics.incrementExisting();
 				result = "existing";
+				userAuditLogService.logSocialLink(existingSocial, "POST /internal/users/ensure-social");
 				log.info(
 					"social_link provider={} providerUserId={} email={} userId={} result={} errorCode={}",
 					provider,
@@ -164,6 +172,7 @@ public class UserServiceImpl implements UserService {
 				result,
 				errorCode
 			);
+			userAuditLogService.logSocialLink(linkResult.userSocial, "POST /internal/users/ensure-social");
 			return get(linkResult.userSocial.getUser().getId());
 		} catch (BusinessException e) {
 			errorCode = e.getErrorCode().name();
@@ -208,7 +217,9 @@ public class UserServiceImpl implements UserService {
 	 */
 	public UserResponse.UserDetailResponse updateStatus(UUID userId, UserRequest.UserStatusUpdateRequest request) {
 		User user = getUserEntity(userId);
+		UserStatus before = user.getStatus();
 		user.changeStatus(request.getStatus());
+		userAuditLogService.logStatusChange(user, before, request.getStatus());
 		return UserResponse.UserDetailResponse.from(user);
 	}
 

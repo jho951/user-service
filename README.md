@@ -8,6 +8,7 @@
 - 이 서비스의 코드 SoT: `User-server` `main`
 - 인터페이스 변경 시 본 저장소 구현보다 계약 레포 변경을 먼저 반영합니다.
 - 책임 분리: `User-server`는 프로필 가시성/개인정보 공개 범위, `Authz-server`는 권한 진실, 소비자 서비스는 실제 기능 집행을 소유합니다.
+- 감사 이벤트는 `audit-log` 공통 모듈로 발행합니다.
 
 ## Modules
 
@@ -51,6 +52,7 @@ export USER_SERVICE_INTERNAL_JWT_SCOPE=internal
 - `USER_SERVICE_INTERNAL_JWT_AUDIENCE`: 내부 JWT `aud`
 - `USER_SERVICE_INTERNAL_JWT_SECRET`: 내부 JWT HMAC 비밀키
 - `USER_SERVICE_INTERNAL_JWT_SCOPE`(선택): 내부 호출 scope (기본값 `internal`)
+- `AUDITLOG_ENABLED`, `AUDITLOG_SERVICE_NAME`, `AUDITLOG_ENV`, `AUDITLOG_FILE_PATH`: 공통 감사 로그 설정
 
 호환성을 위해 기존 `AUTH_JWT_*` 환경변수도 계속 읽지만, 서비스 간 설정 일치를 위해 `USER_SERVICE_INTERNAL_JWT_*` 사용을 권장합니다.
 
@@ -105,6 +107,7 @@ MySQL 설정은 compose 파일에 직접 넣지 않고 아래 `cnf` 디렉터리
 - `GET /internal/users/{userId}`
 - `GET /internal/users/by-email?email=...`
 - 프로필 공개 범위와 권한 노출은 별도 visibility/privacy 정책으로 관리합니다.
+- 프로필/가시성/개인정보 변경 이력은 `audit-log` 공통 모듈로 발행합니다.
 
 `POST /internal/users/find-or-create-and-link-social`는 소셜 링크 매핑의 원본 데이터를 `user-service`가 소유합니다.
 

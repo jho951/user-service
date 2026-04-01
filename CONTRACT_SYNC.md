@@ -4,6 +4,7 @@
 - Service SoT Branch: `main`
 - Contract Role: User master and social-link ownership
 - Profile visibility/privacy ownership: user-service
+- Audit Log: https://github.com/jho951/contract/blob/main/contracts/audit-log/README.md
 
 ## Required Links
 - User OpenAPI: https://github.com/jho951/contract/blob/main/contracts/openapi/user-service.v1.yaml
@@ -18,3 +19,4 @@
 - [ ] trace headers logged and propagated
 - [ ] social link ownership behavior aligned with contract
 - [ ] profile visibility/privacy policy aligned with contract
+- [ ] audit-log event emission matches `contracts/audit-log/service-events.md`

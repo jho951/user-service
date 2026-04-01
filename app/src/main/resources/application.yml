@@ -15,3 +15,12 @@ security:
     secret: ${USER_SERVICE_INTERNAL_JWT_SECRET:${AUTH_JWT_SECRET:}}
     audience: ${USER_SERVICE_INTERNAL_JWT_AUDIENCE:${AUTH_JWT_AUDIENCE:}}
     internal-scope: ${USER_SERVICE_INTERNAL_JWT_SCOPE:${AUTH_INTERNAL_SCOPE:internal}}
+
+auditlog:
+  enabled: ${AUDITLOG_ENABLED:true}
+  service-name: ${AUDITLOG_SERVICE_NAME:${spring.application.name:user-service}}
+  env: ${AUDITLOG_ENV:${spring.profiles.active:local}}
+  file-path: ${AUDITLOG_FILE_PATH:./logs/audit.log}
+  async-enabled: ${AUDITLOG_ASYNC_ENABLED:true}
+  async-thread-count: ${AUDITLOG_ASYNC_THREAD_COUNT:2}
+  async-queue-capacity: ${AUDITLOG_ASYNC_QUEUE_CAPACITY:1000}
