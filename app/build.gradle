@@ -1,17 +1,17 @@
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'org.springframework.boot' version "${spring_boot_version}"
     id 'java'
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(javaVersion as int)
+        languageVersion = JavaLanguageVersion.of(java_version as int)
     }
 }
 
 dependencies {
     implementation project(':common')
-    implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    implementation platform("org.springframework.boot:spring-boot-dependencies:${spring_boot_version}")
     implementation platform(libs.platform.governance.bom)
     implementation libs.platform.governance.starter
     implementation platform(libs.platform.security.bom)
@@ -28,10 +28,10 @@ dependencies {
 
     runtimeOnly 'com.mysql:mysql-connector-j'
 
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${lombok_version}"
 
-    testImplementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    testImplementation platform("org.springframework.boot:spring-boot-dependencies:${spring_boot_version}")
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'com.h2database:h2'

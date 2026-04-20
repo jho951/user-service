@@ -1,6 +1,6 @@
 allprojects {
-    group = property('projectGroup')
-    version = property('projectVersion')
+    group = property('project_group')
+    version = property('project_version')
 }
 
 subprojects {

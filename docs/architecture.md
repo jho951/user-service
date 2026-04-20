@@ -43,6 +43,7 @@ user-service가 직접 소유하지 않습니다.
 | `app` | Spring Boot 애플리케이션과 user-service 업무 로직 | 사용자 API, 소셜 링크, 보안 정책 입력, 감사 adapter, runtime 설정 | 여러 서비스가 공유해야 하는 범용 라이브러리 코드 |
 | `common` | 서비스 내부 공통 인프라 | 공통 응답, 공통 예외, base entity, logging helper | user-service 도메인 규칙 |
 | `docker` | 컨테이너 실행 정의 | Dockerfile, dev/prod Compose, MySQL 설정 | 로컬 shell orchestration |
+| `infra` | 운영 인프라 정의 | Terraform AWS ECS/Fargate Blue/Green, ALB, ECR, CodeDeploy, RDS | 애플리케이션 런타임 로직 |
 | `scripts` | 로컬/운영 보조 명령 | Docker 실행 래퍼, 로컬 bootRun 래퍼 | 서비스 런타임 로직 |
 | `docs` | 설계와 운영 문서 | 구조, API, DB, Docker, platform, OpenAPI | 코드가 기준이어야 하는 구현 세부사항 |
 
@@ -52,9 +53,7 @@ user-service가 직접 소유하지 않습니다.
 
 | 패키지 | 로컬 역할 |
 | --- | --- |
-| `config.security` | platform-security 체인에서 호출하는 서비스별 접근 정책 |
 | `config.logging` | request MDC와 access log filter |
-| `config.governance` | platform-governance 감사 설정 |
 | `domain.user` | 사용자, 사용자 상태, 소셜 링크 API와 업무 규칙 |
 | `domain.audit` | user-service 감사 이벤트 기록 adapter |
 
@@ -72,7 +71,7 @@ user-service가 직접 소유하지 않습니다.
 - 도메인 패키지는 controller 패키지에 의존하지 않습니다.
 - Controller는 request/response 변환과 흐름 위임만 담당하고, 판단은 service에 위임합니다.
 - 소셜 링크의 canonical owner는 user-service입니다. auth-service는 인증 흐름을 담당하되 소셜 링크 소유권을 직접 판단하지 않습니다.
-- Spring Security 체인 조립과 JWT 검증은 platform-security가 담당합니다. `config.security`는 서비스별 접근 정책 입력만 둡니다.
+- Spring Security 체인 조립과 JWT 검증은 platform-security가 담당합니다.
 - 감사 이벤트 발생 시점은 도메인 service가 결정하고, platform-governance 변환은 adapter에 둡니다.
 
 ## 코드 배치 규칙

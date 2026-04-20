@@ -1,7 +1,3 @@
-rootProject.name = 'user-service'
-include 'common'
-include 'app'
-
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
@@ -9,12 +5,8 @@ dependencyResolutionManagement {
             maven {
                 url = uri("https://maven.pkg.github.com/jho951/${repoName}")
                 def githubPackagesUsername = providers.environmentVariable('GITHUB_ACTOR')
-                    .orElse(providers.gradleProperty('githubPackagesUsername'))
-                    .orElse(providers.gradleProperty('githubUsername'))
                     .orElse('jho951')
                 def githubPackagesToken = providers.environmentVariable('GH_TOKEN')
-                    .orElse(providers.gradleProperty('githubPackagesToken'))
-                    .orElse(providers.gradleProperty('githubToken'))
                 if (githubPackagesUsername.present && githubPackagesToken.present) {
                     credentials {
                         username = githubPackagesUsername.get()
@@ -25,3 +17,7 @@ dependencyResolutionManagement {
         }
     }
 }
+
+rootProject.name = 'user-service'
+include 'common'
+include 'app'

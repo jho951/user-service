@@ -9,7 +9,7 @@
 가능한 원인:
 
 - Bearer token이 없습니다.
-- gateway 사용자 컨텍스트 헤더가 없습니다.
+- gateway가 검증한 사용자 식별자가 없습니다.
 - JWT issuer, audience, secret이 설정과 다릅니다.
 - `sub` claim이 비어 있습니다.
 
@@ -18,7 +18,7 @@
 - `USER_SERVICE_INTERNAL_JWT_ISSUER`
 - `USER_SERVICE_INTERNAL_JWT_AUDIENCE`
 - `USER_SERVICE_INTERNAL_JWT_SECRET`
-- gateway가 `Authorization` 또는 `X-User-Id`, `X-User-Status`를 전달하는지 확인합니다.
+- gateway가 `Authorization` 또는 검증된 `X-User-Id`를 전달하는지 확인합니다.
 
 조치:
 
@@ -33,19 +33,18 @@
 
 가능한 원인:
 
-- 사용자 상태가 `A`가 아닙니다.
-- gateway가 오래된 `X-User-Status`를 전달했습니다.
-- JWT의 `status` claim이 active 상태가 아닙니다.
+- DB의 사용자 상태가 `ACTIVE`가 아닙니다.
+- JWT `sub` 또는 gateway가 전달한 사용자 식별자가 다른 사용자를 가리킵니다.
 
 확인:
 
 - `users` 테이블의 사용자 상태를 확인합니다.
-- gateway principal 또는 JWT claim의 status 값을 확인합니다.
+- gateway principal 또는 JWT `sub`가 실제 사용자 ID와 일치하는지 확인합니다.
 
 조치:
 
 - 사용할 수 있는 계정이면 상태를 active로 변경합니다.
-- gateway 사용자 컨텍스트 캐시가 있다면 갱신합니다.
+- gateway 사용자 식별자 전달 설정을 확인합니다.
 
 ## 내부 API가 403을 반환함
 

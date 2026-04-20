@@ -59,6 +59,14 @@ public interface UserService {
 	UserResponse.UserDetailResponse updateStatus(UUID userId, UserRequest.UserStatusUpdateRequest request);
 
 	/**
+	 * 인증된 사용자의 내 정보를 조회합니다.
+	 *
+	 * @param userId 인증된 사용자 식별자
+	 * @return active 상태 사용자 상세 응답
+	 */
+	UserResponse.UserDetailResponse getMe(UUID userId);
+
+	/**
 	 * 사용자 식별자로 사용자를 조회합니다.
 	 *
 	 * @param userId 사용자 식별자

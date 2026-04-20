@@ -2,21 +2,19 @@
 
 ## Gradle 프로젝트
 
-Gradle 루트는 멀티모듈 집계 프로젝트입니다.
-
 ```text
 user-service
 ├── app
 └── common
 ```
 
-모듈 구성:
+### 모듈 구성:
 
-| 모듈 | Gradle 플러그인 | 로컬 역할 |
-| --- | --- | --- |
-| root | Gradle root project | 전체 모듈 집계, 공통 group/version 관리 |
-| `app` | Spring Boot, Java | 실행 가능한 user-service 애플리케이션 |
-| `common` | `java-library` | 공통 응답/예외/로깅/base entity 인프라 |
+| 모듈       | Gradle 플러그인         | 로컬 역할                         |
+|----------|---------------------|-------------------------------|
+| root     | Gradle root project | 전체 모듈 집계, 공통 group/version 관리 |
+| `app`    | Spring Boot, Java   | 실행 가능한 user-service 애플리케이션    |
+| `common` | `java-library`      | 공통 응답/예외/로깅/base entity 인프라   |
 
 루트 `settings.gradle`는 아래 모듈만 include합니다.
 
@@ -38,16 +36,20 @@ include 'app'
 
 필수 속성:
 
-- `projectGroup`
-- `projectVersion`
-- `javaVersion`
-- `springBootVersion`
-- `jakartaPersistenceVersion`
-- `lombokVersion`
+- `project_group`
+- `project_version`
+- `java_version`
+- `spring_boot_version`
+- `springdoc_openapi_version`
+- `jakarta_persistence_version`
+- `lombok_version`
+- `jjwt_version`
 
 ## 의존성 해석
 
 Repository는 `settings.gradle`의 `dependencyResolutionManagement`에서 중앙 관리합니다.
+
+platform package는 private package이므로 인증값이 필요합니다.
 
 사용 repository:
 
@@ -56,8 +58,6 @@ Repository는 `settings.gradle`의 `dependencyResolutionManagement`에서 중앙
 - GitHub Packages: `https://maven.pkg.github.com/jho951/platform-security`
 - GitHub Packages: `https://maven.pkg.github.com/jho951/platform-integrations`
 
-platform package는 private package이므로 인증값이 필요합니다.
-
 로컬 shell:
 
 ```bash
@@ -65,15 +65,7 @@ export GITHUB_ACTOR=jho951
 export GH_TOKEN=<github-token-with-read-packages>
 ```
 
-또는 `~/.gradle/gradle.properties`:
-
-```properties
-githubPackagesUsername=your-github-id
-githubPackagesToken=your-package-read-token
-```
-
-기존 로컬 설정과의 호환을 위해 `githubUsername`, `githubToken`도 fallback으로 읽습니다.
-
+Gradle은 GitHub Packages 인증값으로 `GITHUB_ACTOR`와 `GH_TOKEN`만 읽습니다.
 CI와 Docker build도 `GH_TOKEN`을 GitHub Packages token으로 사용합니다.
 토큰에는 `read:packages` 권한이 필요합니다.
 
@@ -121,8 +113,6 @@ CI 공통 기준:
 ./gradlew clean :app:bootRun
 ```
 
-Docker 실행 기준은 [docker.md](./docker.md)에 정리되어 있습니다.
-
 ## 구현 규칙
 
 모듈 의존 방향:
@@ -145,8 +135,7 @@ Spring Boot 실행 진입점:
 구현 시 코드 배치 기준은 [architecture.md](./architecture.md)를 따릅니다.
 
 DB 변경 기준은 [database.md](./database.md)를 따릅니다.
-
-Docker 실행 기준은 [docker.md](./docker.md)를 따릅니다.
+Docker 실행 기준은 [docker.md](./docker.md)에 정리되어 있습니다.
 
 ## 완료 기준
 

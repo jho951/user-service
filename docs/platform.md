@@ -1,19 +1,21 @@
 # Platform 사용 기준
 
 user-service는 `platform-governance`, `platform-security`, `platform-security-governance-bridge`를 감사 기록과 운영 governance/security 경계로 사용합니다.
+
 인증 토큰 발급, 세션, credential 정책의 소유자는 auth-service입니다.
 
 버전:
 
-| Platform | Version |
-| --- | --- |
-| `platform-governance` | `2.0.1` |
-| `platform-security` | `2.0.3` |
-| `platform-security-governance-bridge` | `1.0.1` |
+| Platform                              | Version  |
+|---------------------------------------|----------|
+| `platform-governance`                 | `2.0.1`  |
+| `platform-security`                   | `2.0.3`  |
+| `platform-security-governance-bridge` | `1.0.1`  |
 
 ## Governance
 
 user-service는 `platform-governance`를 감사 기록과 governance policy 경계로 사용합니다.
+
 도메인 판단과 이벤트 생성 시점은 user-service가 소유합니다.
 
 ```gradle
@@ -131,7 +133,7 @@ platform:
 | `PLATFORM_SECURITY_SERVICE_ROLE_PRESET` | `API_SERVER` | API 서버용 보안 preset |
 | `PLATFORM_SECURITY_AUTH_ENABLED` | `true` | platform-security starter 체인의 인증 정책 활성화 |
 | `PLATFORM_SECURITY_INTERNAL_TOKEN_ENABLED` | `true` | internal boundary token 정책 활성화 |
-| `PLATFORM_SECURITY_GATEWAY_HEADER_ENABLED` | `true` | gateway 사용자 컨텍스트 헤더 인증 활성화 |
+| `PLATFORM_SECURITY_GATEWAY_HEADER_ENABLED` | `true` | gateway가 검증한 사용자 식별자 헤더 인증 활성화 |
 | `PLATFORM_SECURITY_IP_GUARD_ENABLED` | `false` | user-service 기존 네트워크/접근 제어 흐름 사용 |
 | `PLATFORM_SECURITY_RATE_LIMIT_ENABLED` | `false` | user-service 기존 traffic 제어 흐름 사용 |
 

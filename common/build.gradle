@@ -4,22 +4,22 @@ plugins {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(javaVersion as int)
+        languageVersion = JavaLanguageVersion.of(java_version as int)
     }
 }
 
 dependencies {
-    api platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    api platform("org.springframework.boot:spring-boot-dependencies:${spring_boot_version}")
 
     api 'org.springframework.data:spring-data-jpa'
     api 'org.springframework:spring-web'
     api 'org.springframework.security:spring-security-core'
-    api "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenapiVersion}"
-    api "jakarta.persistence:jakarta.persistence-api:${jakartaPersistenceVersion}"
+    api "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdoc_openapi_version}"
+    api "jakarta.persistence:jakarta.persistence-api:${jakarta_persistence_version}"
     api 'org.hibernate.orm:hibernate-core'
     api 'com.fasterxml.jackson.core:jackson-annotations'
 
     compileOnly 'jakarta.servlet:jakarta.servlet-api'
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    compileOnly "org.projectlombok:lombok:${lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${lombok_version}"
 }

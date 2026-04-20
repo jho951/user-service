@@ -95,14 +95,9 @@ private UUID id;
 | `S` | `SUSPENDED` | 정지 |
 | `D` | `DELETED` | 삭제 |
 
-API request에서 enum 이름을 받을 경우 다음 값으로 해석해야 합니다.
+API request와 response에서는 enum 이름을 사용합니다.
 
-- `ACTIVE`
-- `PENDING`
-- `SUSPENDED`
-- `DELETED`
-
-코드값 `A`, `P`, `S`, `D`도 허용합니다.
+DB에는 DB code로 저장합니다.
 
 삭제 정책 메모:
 

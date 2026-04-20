@@ -12,7 +12,7 @@
 | 항목           | 값                  |
 |--------------|--------------------|
 | 구현/PR/런타임 이름 | `user-service`     |
-| Gradle group | `io.github.jho951` |
+| Gradle group | `com.userservice` |
 | 서비스 포트       | `8082`             |
 
 ## Contract Source
@@ -60,10 +60,11 @@ curl -i http://localhost:8082/actuator/prometheus
 
 - [문서 홈](docs/README.md)
 - [구조](docs/architecture.md)
-- [Auth API](docs/auth-api.md)
+- [Auth API](docs/api.md)
 - [CI와 구현 기준](docs/ci-and-implementation.md)
 - [DB](docs/database.md)
 - [Docker](docs/docker.md)
+- [Terraform 인프라](infra/terraform/README.md)
 - [Platform 사용 기준](docs/platform.md)
 - [문제 해결](docs/troubleshooting.md)
 - [OpenAPI](docs/openapi/user-service.yml)

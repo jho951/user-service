@@ -308,9 +308,9 @@ components:
           type: string
           format: email
         role:
-          type: string
+          $ref: '#/components/schemas/UserRole'
         status:
-          type: string
+          $ref: '#/components/schemas/UserStatus'
     UserSocialCreateRequest:
       type: object
       required: [userId, socialType, providerId]
@@ -319,7 +319,7 @@ components:
           type: string
           format: uuid
         socialType:
-          type: string
+          $ref: '#/components/schemas/UserSocialType'
         providerId:
           type: string
     UserEnsureSocialRequest:
@@ -330,21 +330,22 @@ components:
           type: string
           format: email
         socialType:
-          type: string
+          allOf:
+            - $ref: '#/components/schemas/UserSocialType'
           description: provider와 동의어 alias 허용
         providerId:
           type: string
           description: providerUserId와 동의어 alias 허용
         role:
-          type: string
+          $ref: '#/components/schemas/UserRole'
         status:
-          type: string
+          $ref: '#/components/schemas/UserStatus'
     UserStatusUpdateRequest:
       type: object
       required: [status]
       properties:
         status:
-          type: string
+          $ref: '#/components/schemas/UserStatus'
     UserSocialResponse:
       type: object
       properties:
@@ -355,14 +356,14 @@ components:
           type: string
           format: uuid
         provider:
-          type: string
+          $ref: '#/components/schemas/UserSocialType'
         providerUserId:
           type: string
         email:
           type: string
           format: email
         socialType:
-          type: string
+          $ref: '#/components/schemas/UserSocialType'
         providerId:
           type: string
     UserDetailResponse:
@@ -375,9 +376,9 @@ components:
           type: string
           format: email
         role:
-          type: string
+          $ref: '#/components/schemas/UserRole'
         status:
-          type: string
+          $ref: '#/components/schemas/UserStatus'
         createdAt:
           type: string
           format: date-time
@@ -388,6 +389,30 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserSocialResponse'
+    UserRole:
+      type: string
+      description: API에서는 enum 이름만 사용한다.
+      enum:
+        - SUPER_ADMIN
+        - ADMIN
+        - USER
+        - GUEST
+    UserStatus:
+      type: string
+      description: API에서는 enum 이름만 사용하며, DB에는 A/P/S/D 코드로 저장한다.
+      enum:
+        - ACTIVE
+        - PENDING
+        - SUSPENDED
+        - DELETED
+    UserSocialType:
+      type: string
+      description: API에서는 enum 이름만 사용하며, DB에는 DEF/GGL/KKO/GHB 코드로 저장한다.
+      enum:
+        - DEFAULT
+        - GOOGLE
+        - KAKAO
+        - GITHUB
     UserCreateResponse:
       type: object
       properties:

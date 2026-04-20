@@ -45,11 +45,11 @@ public class UserController {
 	 * @param authentication 인증 객체
 	 * @return 내 사용자 정보 응답
 	 */
-	@PreAuthorize("@jwtAccessPolicy.hasActiveStatus(authentication)")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/me")
 	public ResponseEntity<GlobalResponse<UserResponse.UserDetailResponse>> me(Authentication authentication) {
 		UUID userId = resolveUserId(authentication);
-		return GlobalResponse.success(SuccessCode.USER_ME_GET_SUCCESS, userService.get(userId));
+		return GlobalResponse.success(SuccessCode.USER_ME_GET_SUCCESS, userService.getMe(userId));
 	}
 
 	private UUID resolveUserId(Authentication authentication) {

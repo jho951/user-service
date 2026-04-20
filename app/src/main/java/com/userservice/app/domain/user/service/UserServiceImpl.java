@@ -224,6 +224,22 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	/**
+	 * 인증된 사용자의 내 정보를 조회합니다.
+	 *
+	 * @param userId 인증된 사용자 식별자
+	 * @return active 상태 사용자 상세 응답
+	 */
+	public UserResponse.UserDetailResponse getMe(UUID userId) {
+		User user = getUserEntityWithSocials(userId);
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new BusinessException(ErrorCode.FORBIDDEN);
+		}
+		return UserResponse.UserDetailResponse.from(user);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	/**
 	 * 사용자 식별자로 사용자를 조회합니다.
 	 *
 	 * @param userId 사용자 식별자

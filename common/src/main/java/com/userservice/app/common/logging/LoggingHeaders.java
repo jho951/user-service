@@ -7,7 +7,6 @@ public final class LoggingHeaders {
 	public static final String TRACEPARENT = "traceparent";
 	public static final String X_FORWARDED_FOR = "X-Forwarded-For";
 	public static final String X_USER_ID = "X-User-Id";
-	public static final String X_USER_STATUS = "X-User-Status";
 
 	private LoggingHeaders() {
 	}

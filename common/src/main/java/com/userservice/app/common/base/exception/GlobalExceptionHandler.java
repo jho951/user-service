@@ -1,6 +1,7 @@
 package com.userservice.app.config;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -66,6 +67,22 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(errorCode.getHttpStatus())
 			.body(GlobalResponse.fail(errorCode, message));
+	}
+
+	/**
+	 * 요청 본문을 읽을 수 없는 예외를 처리합니다.
+	 *
+	 * @param e 요청 본문 변환 예외
+	 * @return 에러 응답
+	 */
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<GlobalResponse<Void>> handleHttpMessageNotReadableException(
+		HttpMessageNotReadableException e
+	) {
+		ErrorCode errorCode = ErrorCode.BAD_REQUEST;
+		return ResponseEntity
+			.status(errorCode.getHttpStatus())
+			.body(GlobalResponse.fail(errorCode));
 	}
 
 	/**

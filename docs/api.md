@@ -12,6 +12,7 @@ Internal service
 ```
 
 user-service는 public API version prefix를 소유하지 않습니다.
+
 Gateway는 public `/v1/...` route를 user-service upstream route로 전달하기 전에 `/v1` prefix를 제거합니다.
 
 | 구분 | 경로 | 소유자 | 설명 |
@@ -23,6 +24,8 @@ Gateway는 public `/v1/...` route를 user-service upstream route로 전달하기
 | Metrics route | `/actuator/prometheus` | user-service | Prometheus metric |
 
 ## Endpoint
+
+상세 schema는 [OpenAPI](./openapi/user-service.yml)를 기준으로 합니다.
 
 | Area | Method | Upstream path | Public path example | Response | Notes |
 | --- | --- | --- | --- | --- | --- |
@@ -37,7 +40,6 @@ Gateway는 public `/v1/...` route를 user-service upstream route로 전달하기
 | Internal | `GET` | `/internal/users/by-email` | internal | `200 GlobalResponse<UserDetailResponse>` | 이메일 조회 |
 | Internal | `GET` | `/internal/users/by-social` | internal | `200 GlobalResponse<UserDetailResponse>` | 소셜 provider key 조회 |
 
-상세 schema는 [OpenAPI](./openapi/user-service.yml)를 기준으로 합니다.
 
 ## Common
 
@@ -61,7 +63,7 @@ Gateway는 public `/v1/...` route를 user-service upstream route로 전달하기
   "version": 0,
   "email": "user@example.com",
   "role": "USER",
-  "status": "A",
+  "status": "ACTIVE",
   "createdAt": "2026-04-01T12:00:00",
   "modifiedAt": "2026-04-01T12:00:00",
   "userSocialList": []
@@ -121,15 +123,15 @@ Rules:
 | --- | --- |
 | Upstream | `GET /users/me` |
 | Public example | `GET /v1/users/me` |
-| Credential | Bearer JWT 또는 gateway user context |
+| Credential | Bearer JWT 또는 gateway가 검증한 사용자 식별자 |
 | Success | `200 GlobalResponse<UserDetailResponse>` |
 
 Rules:
 
-- 인증된 사용자 식별자가 필요합니다.
-- 사용자 상태가 active가 아니면 거부합니다.
-- active 상태의 내부 코드는 `A`입니다.
-- `P`, `S`, `D` 상태 사용자는 `/users/me`를 사용할 수 없습니다.
+- 인증된 사용자 식별자가 필요합니다. JWT를 사용할 때는 `sub == userId`를 원칙으로 합니다.
+- user-service는 인증된 `userId`로 DB에서 사용자와 상태를 조회합니다.
+- DB의 사용자 상태가 `ACTIVE`가 아니면 user-service가 직접 거부합니다.
+- gateway가 전달하는 `X-User-Status` 또는 JWT `status` claim은 `/users/me` 권한 판단에 사용하지 않습니다.
 
 ## Internal APIs
 
@@ -257,7 +259,7 @@ Request:
 
 ## 상태와 Role
 
-상태 코드는 다음 값을 사용합니다.
+API request와 response의 상태 값은 enum 이름만 사용합니다.
 
 | JSON/Enum | DB code | 설명 |
 | --- | --- | --- |
@@ -266,9 +268,8 @@ Request:
 | `SUSPENDED` | `S` | 정지 |
 | `DELETED` | `D` | 삭제 |
 
-API request에서 enum 이름과 DB code를 모두 받을 수 있습니다.
+DB에는 enum 이름을 그대로 저장하지 않고 DB code로 저장합니다.
 
-현재 삭제 상태는 `status = DELETED` 또는 `D`로 표현합니다.
 탈퇴 복구, 재가입 제한, 개인정보 파기 배치 요구사항이 확정되면 `deletedAt` 응답 필드와 `users.deleted_at` 컬럼을 추가할 예정입니다.
 
 Role은 다음 값을 사용합니다.
@@ -282,6 +283,7 @@ Spring Security authority 문자열인 `ROLE_SUPER_ADMIN`, `ROLE_ADMIN`, `ROLE_U
 
 ## Gateway 사용자 컨텍스트
 
-- gateway가 전달하는 `X-User-Id`, `X-User-Status`를 사용자 컨텍스트로 사용할 수 있습니다.
-- user-service는 gateway 컨텍스트를 받더라도 사용자 active 상태 검사를 수행해야 합니다.
-- JWT 사용자 식별자는 `sub == userId`를 원칙으로 합니다.
+- gateway가 검증 후 전달하는 `X-User-Id`는 인증된 사용자 식별자로 사용할 수 있습니다.
+- gateway는 외부 요청의 사용자 컨텍스트 헤더를 제거하고 검증된 값으로 재생성해야 합니다.
+- `X-User-Status`는 user-service 권한 판단에 사용하지 않습니다. 필요하면 로그나 디버깅 참고값으로만 취급합니다.
+- 사용자 active 상태 검사는 user-service가 DB 상태를 기준으로 직접 수행합니다.

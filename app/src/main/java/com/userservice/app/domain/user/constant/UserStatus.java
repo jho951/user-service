@@ -2,9 +2,6 @@ package com.userservice.app.domain.user.constant;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
 /**
  * 사용자 상태를 정의합니다.
  */
@@ -46,16 +43,6 @@ public enum UserStatus {
 	}
 
 	/**
-	 * JSON 응답으로 내려갈 값을 반환합니다.
-	 *
-	 * @return 상태 코드
-	 */
-	@JsonValue
-	public String toJson() {
-		return code;
-	}
-
-	/**
 	 * DB 코드를 enum으로 변환합니다.
 	 *
 	 * @param code DB 저장 상태 코드
@@ -66,27 +53,5 @@ public enum UserStatus {
 			.filter(status -> status.code.equals(code))
 			.findFirst()
 			.orElseThrow(() -> new IllegalArgumentException("Unknown user status code: " + code));
-	}
-
-	/**
-	 * JSON 요청 값을 enum으로 변환합니다.
-	 * 코드값(A/P/S/D)과 enum 이름(ACTIVE/...)을 모두 허용합니다.
-	 *
-	 * @param value 요청 값
-	 * @return 매핑된 사용자 상태
-	 */
-	@JsonCreator
-	public static UserStatus fromJson(String value) {
-		if (value == null || value.isBlank()) {
-			throw new IllegalArgumentException("User status value is blank");
-		}
-
-		String normalized = value.trim();
-
-		return Arrays.stream(values())
-			.filter(status -> status.code.equalsIgnoreCase(normalized)
-				|| status.name().equalsIgnoreCase(normalized))
-			.findFirst()
-			.orElseThrow(() -> new IllegalArgumentException("Unknown user status value: " + value));
 	}
 }
