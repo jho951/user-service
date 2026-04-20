@@ -1,5 +1,5 @@
 [versions]
-platform-governance = "2.0.0"
+platform-governance = "2.0.1"
 platform-security = "2.0.3"
 platform-integrations = "1.0.1"
 
