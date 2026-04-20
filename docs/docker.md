@@ -148,8 +148,8 @@ MySQL data volume:
 
 | 환경 | volume |
 | --- | --- |
-| `dev` | `user_server_mysql_data_dev` |
-| `prod` | `user_server_mysql_data_prod` |
+| `dev` | `user_service_mysql_data_dev` |
+| `prod` | `user_service_mysql_data_prod` |
 
 MySQL config:
 

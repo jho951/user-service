@@ -1,20 +1,20 @@
 # Platform 사용 기준
 
-User-server는 `platform-governance`, `platform-security`, `platform-security-governance-bridge`를 감사 기록과 운영 governance/security 경계로 사용합니다.
+user-service는 `platform-governance`, `platform-security`, `platform-security-governance-bridge`를 감사 기록과 운영 governance/security 경계로 사용합니다.
 인증 토큰 발급, 세션, credential 정책의 소유자는 auth-service입니다.
 
 버전:
 
 | Platform | Version |
 | --- | --- |
-| `platform-governance` | `2.0.0` |
-| `platform-security` | `2.0.0` |
+| `platform-governance` | `2.0.1` |
+| `platform-security` | `2.0.3` |
 | `platform-security-governance-bridge` | `1.0.1` |
 
 ## Governance
 
-User-server는 `platform-governance`를 감사 기록과 governance policy 경계로 사용합니다.
-도메인 판단과 이벤트 생성 시점은 User-server가 소유합니다.
+user-service는 `platform-governance`를 감사 기록과 governance policy 경계로 사용합니다.
+도메인 판단과 이벤트 생성 시점은 user-service가 소유합니다.
 
 ```gradle
 implementation platform(libs.platform.governance.bom)
@@ -24,7 +24,7 @@ implementation libs.platform.security.starter
 implementation libs.platform.security.governance.bridge
 ```
 
-User-server 도메인 코드는 governance 1계층 구현 타입을 직접 소비하지 않습니다.
+user-service 도메인 코드는 governance 1계층 구현 타입을 직접 소비하지 않습니다.
 
 | 용도 | 타입 |
 | --- | --- |
@@ -87,8 +87,8 @@ platform:
 
 ## Security 설정
 
-User-server의 Spring Security 체인 조립은 `platform-security-starter`가 담당합니다.
-User-server는 JWT decoder/converter와 서비스별 boundary 설정만 제공합니다.
+user-service의 Spring Security 체인 조립은 `platform-security-starter`가 담당합니다.
+user-service는 JWT decoder/converter와 서비스별 boundary 설정만 제공합니다.
 
 ```yaml
 platform:

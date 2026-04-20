@@ -5,7 +5,7 @@
 Gradle 루트는 멀티모듈 집계 프로젝트입니다.
 
 ```text
-User-server
+user-service
 ├── app
 └── common
 ```

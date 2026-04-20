@@ -1,4 +1,4 @@
-rootProject.name = 'User-server'
+rootProject.name = 'user-service'
 include 'common'
 include 'app'
 

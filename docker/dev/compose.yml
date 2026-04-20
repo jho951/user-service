@@ -1,4 +1,4 @@
-name: user-server-dev
+name: user-service-dev
 
 services:
   mysql:
@@ -12,7 +12,7 @@ services:
     expose:
       - "3306"
     volumes:
-      - user_server_mysql_data_dev:/var/lib/mysql
+      - user_service_mysql_data_dev:/var/lib/mysql
       - ./services/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-root}"]
@@ -34,7 +34,7 @@ services:
         GITHUB_ACTOR: ${GITHUB_ACTOR:-jho951}
       secrets:
         - gh_token
-    image: docker-user-service:dev
+    image: user-service:dev
     depends_on:
       mysql:
         condition: service_healthy
@@ -60,7 +60,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  user_server_mysql_data_dev:
+  user_service_mysql_data_dev:
 
 secrets:
   gh_token:

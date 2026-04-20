@@ -2,7 +2,7 @@ aws_region   = "ap-northeast-2"
 project_name = "msa"
 environment  = "prod"
 
-service_name         = "user-server"
+service_name         = "user-service"
 service_runtime_name = "user-service"
 service_role         = "app-service"
 
@@ -40,8 +40,8 @@ app_env = {
   PLATFORM_GOVERNANCE_AUDIT_ENVIRONMENT  = "prod"
   PLATFORM_SECURITY_ENABLED              = "true"
   PLATFORM_SECURITY_SERVICE_ROLE_PRESET  = "API_SERVER"
-  PLATFORM_SECURITY_AUTH_ENABLED         = "false"
-  PLATFORM_SECURITY_INTERNAL_TOKEN_ENABLED = "false"
+  PLATFORM_SECURITY_AUTH_ENABLED         = "true"
+  PLATFORM_SECURITY_INTERNAL_TOKEN_ENABLED = "true"
   PLATFORM_SECURITY_IP_GUARD_ENABLED       = "false"
   PLATFORM_SECURITY_RATE_LIMIT_ENABLED     = "false"
 }

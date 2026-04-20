@@ -1,4 +1,4 @@
-name: user-server-prod
+name: user-service-prod
 
 services:
   mysql:
@@ -12,7 +12,7 @@ services:
     expose:
       - "3306"
     volumes:
-      - user_server_mysql_data_prod:/var/lib/mysql
+      - user_service_mysql_data_prod:/var/lib/mysql
       - ./services/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
@@ -34,7 +34,7 @@ services:
         GITHUB_ACTOR: ${GITHUB_ACTOR:-jho951}
       secrets:
         - gh_token
-    image: docker-user-service:prod
+    image: user-service:prod
     ports:
       - "${USER_SERVICE_HOST_BIND:?USER_SERVICE_HOST_BIND is required}:${USER_SERVICE_HOST_PORT:-8082}:8082"
     depends_on:
@@ -62,7 +62,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  user_server_mysql_data_prod:
+  user_service_mysql_data_prod:
 
 secrets:
   gh_token:

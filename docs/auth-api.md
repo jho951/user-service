@@ -5,10 +5,10 @@
 ```txt
 Client
   -> Gateway public route: /v1/users/*
-  -> User-service upstream: /users/*
+  -> user-service upstream: /users/*
 
 Internal service
-  -> User-service upstream: /internal/users/*
+  -> user-service upstream: /internal/users/*
 ```
 
 user-service는 public API version prefix를 소유하지 않습니다.
@@ -17,10 +17,10 @@ Gateway는 public `/v1/...` route를 user-service upstream route로 전달하기
 | 구분 | 경로 | 소유자 | 설명 |
 | --- | --- | --- | --- |
 | Public user route | `/v1/users/*` | Gateway | 외부 client가 호출하는 versioned route |
-| User upstream route | `/users/*` | User-service | Gateway가 전달하는 사용자 route |
-| Internal user route | `/internal/users/*` | User-service | auth-service 등 내부 서비스가 호출하는 route |
-| Runtime route | `/actuator/health` | User-service | 상태 확인 |
-| Metrics route | `/actuator/prometheus` | User-service | Prometheus metric |
+| user-service upstream route | `/users/*` | user-service | Gateway가 전달하는 사용자 route |
+| Internal user route | `/internal/users/*` | user-service | auth-service 등 내부 서비스가 호출하는 route |
+| Runtime route | `/actuator/health` | user-service | 상태 확인 |
+| Metrics route | `/actuator/prometheus` | user-service | Prometheus metric |
 
 ## Endpoint
 

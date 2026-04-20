@@ -1,4 +1,4 @@
-# user-server Terraform
+# user-service Terraform
 
 This stack follows the MSA Terraform contract and provisions an ECS/Fargate Blue/Green deployment baseline.
 

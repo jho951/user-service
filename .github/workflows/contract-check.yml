@@ -1,0 +1,37 @@
+name: contract-check
+
+on:
+  pull_request:
+
+jobs:
+  contract-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate contract lock
+        env:
+          SERVICE_NAME: user-service
+        run: |
+          test -f contract.lock.yml
+          grep -q "repo: https://github.com/jho951/contract" contract.lock.yml
+          grep -q "name: ${SERVICE_NAME}" contract.lock.yml
+          grep -q "ref:" contract.lock.yml
+          grep -q "commit:" contract.lock.yml
+          grep -q "consumes:" contract.lock.yml
+
+      - name: Detect contract impact
+        env:
+          CONTRACT_IMPACT_REGEX: '(^app/src/main/java/.*(Controller|User|Profile|Visibility|Privacy|Social|Audit|Security|Error|Response|Dto|Config).*\.java$)|(^app/src/main/resources/.*\.(yml|yaml|properties)$)|(^docs/openapi/)|(^README\.md$)'
+        run: |
+          git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" > changed-files.txt
+          if grep -Eq "${CONTRACT_IMPACT_REGEX}" changed-files.txt; then
+            if ! grep -qx "contract.lock.yml" changed-files.txt; then
+              echo "Contract-impacting files changed. Update contract.lock.yml or split contract changes first."
+              cat changed-files.txt
+              exit 1
+            fi
+          fi

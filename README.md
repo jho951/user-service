@@ -1,6 +1,4 @@
-# User-server
-
-사용자 마스터 데이터, 소셜 계정 연결, 사용자 상태, 내부 사용자 조회 API를 담당하는 `user-service` 구현 저장소입니다.
+# user-service
 
 ## 역할
 
@@ -9,16 +7,20 @@
 - gateway 뒤에서 `/users/**`, `/internal/users/**` API를 제공합니다.
 - 사용자 생성, 상태 변경, 소셜 링크 생성 이력을 감사 로그로 기록합니다.
 
-## 저장소와 런타임 이름
+## 서비스 이름
 
-| 항목 | 값 |
-| --- | --- |
-| 구현 저장소 | `User-server` |
-| 런타임 서비스명 | `user-service` |
+| 항목           | 값                  |
+|--------------|--------------------|
+| 구현/PR/런타임 이름 | `user-service`     |
 | Gradle group | `io.github.jho951` |
-| 서비스 포트 | `8082` |
+| 서비스 포트       | `8082`             |
 
-문서와 Docker, gateway 설정에서는 런타임 이름인 `user-service`를 사용합니다. 저장소나 PR 문맥에서는 `User-server`를 사용합니다.
+## Contract Source
+
+- 공통 계약 레포: `https://github.com/jho951/contract`
+- 계약 동기화 기준 파일: [contract.lock.yml](contract.lock.yml)
+- PR에서는 `.github/workflows/contract-check.yml`이 lock 파일과 계약 영향 변경 여부를 검사합니다.
+- 인터페이스 변경 시 본 저장소 구현보다 계약 레포 변경을 먼저 반영합니다.
 
 ## 빠른 시작
 

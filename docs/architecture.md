@@ -1,12 +1,12 @@
-# User-server 구조
+# user-service 구조
 
 ## 계약 기준
 
-- 구현 저장소 이름은 `User-server`입니다.
+- 구현 저장소 이름은 `user-service`입니다.
 - 런타임 서비스 이름은 `user-service`입니다.
 - Docker service, gateway upstream, metric tag, 감사 로그 service name은 `user-service`를 기준으로 합니다.
 - 서비스 간 책임, API 계약, 이벤트 계약, 공통 identity header 계약은 contract 레포를 기준으로 합니다.
-- 이 문서는 contract를 반복 정의하지 않고, User-server 내부 구현 배치 기준을 다룹니다.
+- 이 문서는 contract를 반복 정의하지 않고, user-service 내부 구현 배치 기준을 다룹니다.
 - 인터페이스 변경 시 본 저장소 구현보다 계약 레포 변경을 먼저 반영합니다.
 
 ## 서비스 책임
@@ -40,7 +40,7 @@ user-service가 직접 소유하지 않습니다.
 
 | 모듈 | 로컬 역할 | 둘 위치 | 두지 않을 것 |
 | --- | --- | --- | --- |
-| `app` | Spring Boot 애플리케이션과 user-service 업무 로직 | 사용자 API, 소셜 링크, 보안 설정, 감사 adapter, runtime 설정 | 여러 서비스가 공유해야 하는 범용 라이브러리 코드 |
+| `app` | Spring Boot 애플리케이션과 user-service 업무 로직 | 사용자 API, 소셜 링크, 보안 정책 입력, 감사 adapter, runtime 설정 | 여러 서비스가 공유해야 하는 범용 라이브러리 코드 |
 | `common` | 서비스 내부 공통 인프라 | 공통 응답, 공통 예외, base entity, logging helper | user-service 도메인 규칙 |
 | `docker` | 컨테이너 실행 정의 | Dockerfile, dev/prod Compose, MySQL 설정 | 로컬 shell orchestration |
 | `scripts` | 로컬/운영 보조 명령 | Docker 실행 래퍼, 로컬 bootRun 래퍼 | 서비스 런타임 로직 |
@@ -52,8 +52,7 @@ user-service가 직접 소유하지 않습니다.
 
 | 패키지 | 로컬 역할 |
 | --- | --- |
-| `config.security` | JWT resource server, 내부 JWT 검증, 접근 정책 |
-| `config.security.gateway` | gateway 사용자 컨텍스트 principal/filter |
+| `config.security` | platform-security 체인에서 호출하는 서비스별 접근 정책 |
 | `config.logging` | request MDC와 access log filter |
 | `config.governance` | platform-governance 감사 설정 |
 | `domain.user` | 사용자, 사용자 상태, 소셜 링크 API와 업무 규칙 |
@@ -73,7 +72,7 @@ user-service가 직접 소유하지 않습니다.
 - 도메인 패키지는 controller 패키지에 의존하지 않습니다.
 - Controller는 request/response 변환과 흐름 위임만 담당하고, 판단은 service에 위임합니다.
 - 소셜 링크의 canonical owner는 user-service입니다. auth-service는 인증 흐름을 담당하되 소셜 링크 소유권을 직접 판단하지 않습니다.
-- `config.security`는 Spring Security 조립과 JWT 검증을 담당합니다. 도메인 service는 security 설정 클래스를 import하지 않습니다.
+- Spring Security 체인 조립과 JWT 검증은 platform-security가 담당합니다. `config.security`는 서비스별 접근 정책 입력만 둡니다.
 - 감사 이벤트 발생 시점은 도메인 service가 결정하고, platform-governance 변환은 adapter에 둡니다.
 
 ## 코드 배치 규칙

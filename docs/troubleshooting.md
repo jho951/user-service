@@ -238,14 +238,13 @@ docker network inspect service-backbone-shared
 - 모든 서비스가 같은 shared network 이름을 사용하도록 맞춥니다.
 - 필요한 경우 `./scripts/run.docker.sh up dev`로 네트워크 생성을 유도합니다.
 
-## `User-server`와 `user-service` 이름이 혼동됨
+## 서비스 이름 기준 확인
 
 정리:
 
-- `User-server`: GitHub 저장소 이름
-- `user-service`: Docker service, gateway upstream, 로그와 metric의 런타임 서비스명
+- GitHub 저장소, PR, Docker service, gateway upstream, 로그와 metric 이름은 모두 `user-service`를 씁니다.
+- 계약 도메인 경로는 contract repo의 `contracts/user/**` 기준을 유지합니다.
 
 조치:
 
-- 코드/문서에서 저장소 맥락은 `User-server`를 씁니다.
-- 런타임, DNS, gateway, 로그 맥락은 `user-service`를 씁니다.
+- 새 workflow, compose, Terraform, 문서에서 별도 legacy 이름을 만들지 않습니다.
