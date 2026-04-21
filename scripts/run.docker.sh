@@ -25,12 +25,38 @@ case "$ENV_NAME" in
   *) usage; exit 1 ;;
 esac
 
+gradle_property() {
+  local key="$1"
+  local gradle_properties="${HOME}/.gradle/gradle.properties"
+  [[ -f "$gradle_properties" ]] || return 0
+  awk -F= -v key="$key" '$1 == key { print $2; exit }' "$gradle_properties"
+}
+
 ENV_FILE="$PROJECT_ROOT/.env.$ENV_NAME"
 if [[ -f "$ENV_FILE" ]]; then
   set -a
   # shellcheck disable=SC1090
   source "$ENV_FILE"
   set +a
+fi
+
+if [[ -z "${GH_TOKEN:-}" ]]; then
+  GH_TOKEN="$(gradle_property githubPackagesToken)"
+  [[ -n "$GH_TOKEN" ]] || GH_TOKEN="$(gradle_property githubToken)"
+  [[ -n "$GH_TOKEN" ]] || GH_TOKEN="$(gradle_property ghToken)"
+  [[ -n "$GH_TOKEN" ]] || GH_TOKEN="$(gradle_property gh_token)"
+  export GH_TOKEN
+fi
+
+if [[ -z "${GITHUB_ACTOR:-}" ]]; then
+  GITHUB_ACTOR="$(gradle_property githubPackagesUsername)"
+  [[ -n "$GITHUB_ACTOR" ]] || GITHUB_ACTOR="$(gradle_property githubUsername)"
+  [[ -n "$GITHUB_ACTOR" ]] || GITHUB_ACTOR="jho951"
+  export GITHUB_ACTOR
+fi
+
+if [[ -z "${GITHUB_TOKEN:-}" && -n "${GH_TOKEN:-}" ]]; then
+  export GITHUB_TOKEN="$GH_TOKEN"
 fi
 
 COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-user-service-${ENV_NAME}}"

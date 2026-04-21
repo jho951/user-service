@@ -3,17 +3,25 @@
 FROM eclipse-temurin:17-jdk AS builder
 WORKDIR /workspace
 
-ARG GITHUB_ACTOR=jho951
-ENV GITHUB_ACTOR=${GITHUB_ACTOR}
-
 COPY gradlew settings.gradle build.gradle gradle.properties ./
 COPY gradle ./gradle
+COPY common/build.gradle common/build.gradle
+COPY app/build.gradle app/build.gradle
+
+RUN chmod +x ./gradlew
+RUN --mount=type=secret,id=gh_token,required=false \
+    --mount=type=secret,id=github_actor,required=false \
+    if [ -f /run/secrets/gh_token ]; then export GH_TOKEN="$(cat /run/secrets/gh_token)"; fi; \
+    if [ -f /run/secrets/github_actor ]; then export GITHUB_ACTOR="$(cat /run/secrets/github_actor)"; fi; \
+    ./gradlew :app:dependencies --no-daemon >/dev/null
+
 COPY common ./common
 COPY app ./app
 
-RUN --mount=type=secret,id=gh_token \
-    chmod +x ./gradlew && \
-    GH_TOKEN="$(cat /run/secrets/gh_token 2>/dev/null || true)" \
+RUN --mount=type=secret,id=gh_token,required=false \
+    --mount=type=secret,id=github_actor,required=false \
+    if [ -f /run/secrets/gh_token ]; then export GH_TOKEN="$(cat /run/secrets/gh_token)"; fi; \
+    if [ -f /run/secrets/github_actor ]; then export GITHUB_ACTOR="$(cat /run/secrets/github_actor)"; fi; \
     ./gradlew clean :app:bootJar -x test --no-daemon
 
 FROM eclipse-temurin:17-jre

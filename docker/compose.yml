@@ -22,10 +22,9 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-      args:
-        GITHUB_ACTOR: ${GITHUB_ACTOR:-jho951}
       secrets:
         - gh_token
+        - github_actor
     depends_on:
       mysql:
         condition: service_healthy
@@ -49,6 +48,8 @@ services:
 secrets:
   gh_token:
     environment: GH_TOKEN
+  github_actor:
+    environment: GITHUB_ACTOR
 
 networks:
   user-private:
