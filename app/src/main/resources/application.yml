@@ -3,6 +3,12 @@ spring:
     name: user-service
   profiles:
     default: dev
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: ${REDIS_TIMEOUT_MS:1000ms}
 
 features:
   public-user-api:
@@ -62,5 +68,10 @@ platform:
         enabled: ${PLATFORM_SECURITY_GATEWAY_HEADER_ENABLED:true}
     ip-guard:
       enabled: ${PLATFORM_SECURITY_IP_GUARD_ENABLED:false}
+      trust-proxy: ${PLATFORM_SECURITY_IP_GUARD_TRUST_PROXY:false}
+      admin:
+        rules: ${PLATFORM_SECURITY_ADMIN_ALLOW_CIDRS:${PLATFORM_SECURITY_ADMIN_ALLOW_CIDR:10.0.0.0/8}}
+      internal:
+        rules: ${PLATFORM_SECURITY_INTERNAL_ALLOW_CIDRS:${PLATFORM_SECURITY_INTERNAL_ALLOW_CIDR:172.16.0.0/12}}
     rate-limit:
       enabled: ${PLATFORM_SECURITY_RATE_LIMIT_ENABLED:false}

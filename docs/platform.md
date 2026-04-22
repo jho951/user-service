@@ -11,9 +11,9 @@ user-service는 `platform-governance`, `platform-security`, `platform-security-g
 
 | Platform                              | Version  |
 |---------------------------------------|----------|
-| `platform-governance`                 | `2.0.1`  |
-| `platform-security`                   | `2.0.3`  |
-| `platform-security-governance-bridge` | `1.0.1`  |
+| `platform-governance`                 | `2.0.2`  |
+| `platform-security`                   | `2.0.5`  |
+| `platform-security-governance-bridge` | `1.0.3`  |
 
 ## Resource 도입 기준
 
@@ -98,10 +98,10 @@ platform:
         validation-enabled: true
         fail-on-validation-error: true
     engine:
-      strict: false
+      strict: true
     violation:
       action: DENY
-      handler-failure-fatal: false
+      handler-failure-fatal: true
     operational:
       fail-fast-enabled: true
       production-profiles: prod
@@ -120,9 +120,9 @@ platform:
 | `PLATFORM_GOVERNANCE_AUDIT_IDENTITY_ENABLED` | `true` | identity audit 활성화 |
 | `PLATFORM_GOVERNANCE_AUDIT_IDENTITY_VALIDATION_ENABLED` | `true` | identity audit validation 활성화 |
 | `PLATFORM_GOVERNANCE_AUDIT_IDENTITY_FAIL_ON_VALIDATION_ERROR` | `true` | identity audit validation 실패 처리 |
-| `PLATFORM_GOVERNANCE_ENGINE_STRICT` | `false` | strict evaluation |
+| `PLATFORM_GOVERNANCE_ENGINE_STRICT` | `true` | strict evaluation |
 | `PLATFORM_GOVERNANCE_VIOLATION_ACTION` | `DENY` | policy violation 처리 방식 |
-| `PLATFORM_GOVERNANCE_VIOLATION_HANDLER_FAILURE_FATAL` | `false` | violation handler 실패를 fatal로 볼지 여부 |
+| `PLATFORM_GOVERNANCE_VIOLATION_HANDLER_FAILURE_FATAL` | `true` | violation handler 실패를 fatal로 볼지 여부 |
 | `PLATFORM_GOVERNANCE_OPERATIONAL_FAIL_FAST_ENABLED` | `true` | 운영 정책 위반 시 기동 실패 여부 |
 | `PLATFORM_GOVERNANCE_OPERATIONAL_PRODUCTION_PROFILES` | `prod` | 운영 profile 목록 |
 | `PLATFORM_GOVERNANCE_OPERATIONAL_ALLOW_NON_STRICT_ENGINE_IN_PRODUCTION` | `false` | 운영 strict engine 예외 허용 여부 |
@@ -164,9 +164,9 @@ platform:
       gateway-header:
         enabled: true
     ip-guard:
-      enabled: false
+      enabled: true
     rate-limit:
-      enabled: false
+      enabled: true
 ```
 
 `/error`는 서블릿 컨테이너가 에러 요청을 전달하는 runtime endpoint이며, user-service가 `ServletErrorResponse` JSON으로 반환합니다.
@@ -178,8 +178,8 @@ platform:
 | `PLATFORM_SECURITY_AUTH_ENABLED` | `true` | platform-security starter 체인의 인증 정책 활성화 |
 | `PLATFORM_SECURITY_INTERNAL_TOKEN_ENABLED` | `true` | internal boundary token 정책 활성화 |
 | `PLATFORM_SECURITY_GATEWAY_HEADER_ENABLED` | `true` | gateway가 검증한 사용자 식별자 헤더 인증 활성화 |
-| `PLATFORM_SECURITY_IP_GUARD_ENABLED` | `false` | user-service 기존 네트워크/접근 제어 흐름 사용 |
-| `PLATFORM_SECURITY_RATE_LIMIT_ENABLED` | `false` | user-service 기존 traffic 제어 흐름 사용 |
+| `PLATFORM_SECURITY_IP_GUARD_ENABLED` | `true` | 운영에서는 admin/internal boundary를 강제합니다. |
+| `PLATFORM_SECURITY_RATE_LIMIT_ENABLED` | `true` | 운영에서는 shared backing `RateLimiter`를 함께 제공합니다. |
 
 ## 감사 이벤트
 

@@ -17,9 +17,12 @@ dependencies {
     implementation platform(libs.platform.security.bom)
     implementation libs.platform.security.starter
     implementation libs.platform.security.governance.bridge
+    implementation "io.github.jho951:rate-limiter-core:2.0.0"
+    implementation "io.github.jho951:rate-limiter-spi:2.0.0"
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-validation'

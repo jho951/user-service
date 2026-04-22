@@ -1,7 +1,7 @@
 [versions]
-platform-governance = "2.0.1"
-platform-security = "2.0.3"
-platform-integrations = "1.0.1"
+platform-governance = "2.0.2"
+platform-security = "2.0.5"
+platform-integrations = "1.0.3"
 
 [libraries]
 platform-governance-bom = { module = "io.github.jho951.platform:platform-governance-bom", version.ref = "platform-governance" }

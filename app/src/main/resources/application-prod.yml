@@ -44,3 +44,17 @@ logging:
     com.api.config.logging.com.userservice.app.config.logging.RequestAccessLogFilter: INFO
     org.hibernate.SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:WARN}
     org.hibernate.orm.jdbc.bind: ${LOGGING_LEVEL_ORG_HIBERNATE_BIND:WARN}
+
+platform:
+  governance:
+    audit:
+      environment: ${PLATFORM_GOVERNANCE_AUDIT_ENVIRONMENT:prod}
+    engine:
+      strict: true
+    violation:
+      handler-failure-fatal: true
+  security:
+    ip-guard:
+      enabled: true
+    rate-limit:
+      enabled: true
