@@ -1,11 +1,13 @@
 [versions]
-platform-governance = "2.0.2"
-platform-security = "2.0.5"
-platform-integrations = "1.0.3"
+platform-governance = "3.0.0"
+platform-security = "3.0.0"
+platform-integrations = "3.0.0"
 
 [libraries]
+platform-runtime-bom = { module = "io.github.jho951.platform:platform-runtime-bom", version.ref = "platform-integrations" }
 platform-governance-bom = { module = "io.github.jho951.platform:platform-governance-bom", version.ref = "platform-governance" }
 platform-governance-starter = { module = "io.github.jho951.platform:platform-governance-starter" }
 platform-security-bom = { module = "io.github.jho951.platform:platform-security-bom", version.ref = "platform-security" }
 platform-security-starter = { module = "io.github.jho951.platform:platform-security-starter", version.ref = "platform-security" }
+platform-security-ratelimit-bridge-starter = { module = "io.github.jho951.platform:platform-security-ratelimit-bridge-starter", version.ref = "platform-security" }
 platform-security-governance-bridge = { module = "io.github.jho951.platform:platform-security-governance-bridge", version.ref = "platform-integrations" }
