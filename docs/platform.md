@@ -11,9 +11,9 @@ user-service는 `platform-governance`, `platform-security`, `platform-security-g
 
 | Platform                              | Version  |
 |---------------------------------------|----------|
-| `platform-governance`                 | `3.0.0`  |
-| `platform-security`                   | `3.0.0`  |
-| `platform-security-governance-bridge` | `3.0.0`  |
+| `platform-governance`                 | `3.0.1`  |
+| `platform-security`                   | `3.0.1`  |
+| `platform-security-governance-bridge` | `3.0.1`  |
 
 ## Resource 도입 기준
 
