@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "Usage: deploy-stack-service.sh <dev|prod>" >&2
+  exit 1
+}
+
+DEPLOY_ENVIRONMENT="${1:-}"
+[[ "$DEPLOY_ENVIRONMENT" == "dev" || "$DEPLOY_ENVIRONMENT" == "prod" ]] || usage
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+CONTRACT_DIR="${CONTRACT_DIR:-$REPO_ROOT/.contract}"
+SERVICE_NAME="${SERVICE_NAME:-}"
+
+if [[ -z "$SERVICE_NAME" && -f "$REPO_ROOT/contract.lock.yml" ]]; then
+  SERVICE_NAME="$(awk '/^[[:space:]]*name:/ { print $2; exit }' "$REPO_ROOT/contract.lock.yml")"
+fi
+SERVICE_NAME="${SERVICE_NAME:-$(basename "$REPO_ROOT")}"
+
+[[ -d "$CONTRACT_DIR" ]] || { echo "Contract dir not found: $CONTRACT_DIR" >&2; exit 1; }
+
+exec "$CONTRACT_DIR/scripts/deploy-service-via-bundle.sh" \
+  --service "$SERVICE_NAME" \
+  --environment "$DEPLOY_ENVIRONMENT"

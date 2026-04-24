@@ -48,9 +48,7 @@ jobs:
       - name: Fetch contract source
         shell: bash
         run: |
-          set -euo pipefail
-          CONTRACT_REF="$(awk '/^[[:space:]]*ref:/ { print $2; exit }' contract.lock.yml)"
-          git clone --depth 1 --branch "$CONTRACT_REF" "$CONTRACT_REPO" .contract
+          bash ./scripts/fetch-contract.sh
 
       - name: Verify consumed contract paths
         shell: bash
