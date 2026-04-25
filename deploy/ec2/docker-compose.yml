@@ -1,0 +1,71 @@
+name: user-service-ec2
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-user_service}
+      MYSQL_USER: ${MYSQL_USER:-user_service}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
+      TZ: ${TZ:-Asia/Seoul}
+    expose:
+      - "3306"
+    volumes:
+      - user_service_mysql_data_prod:/var/lib/mysql
+      - ./services/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      user-private:
+        aliases:
+          - mysql
+    restart: unless-stopped
+
+  user-service:
+    image: ${USER_SERVICE_IMAGE:?USER_SERVICE_IMAGE is required}
+    pull_policy: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${USER_SERVICE_HOST_BIND:-127.0.0.1}:${USER_SERVICE_HOST_PORT:-8082}:8082"
+    expose:
+      - "8082"
+    env_file:
+      - ./.env.production
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/user_service?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-user_service}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:?SPRING_DATASOURCE_PASSWORD is required}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:?AUTH_JWT_SECRET is required}
+      USER_SERVICE_INTERNAL_JWT_SECRET: ${USER_SERVICE_INTERNAL_JWT_SECRET:?USER_SERVICE_INTERNAL_JWT_SECRET is required}
+      USER_SERVICE_INTERNAL_JWT_ISSUER: ${USER_SERVICE_INTERNAL_JWT_ISSUER:-api-gateway}
+      USER_SERVICE_INTERNAL_JWT_AUDIENCE: ${USER_SERVICE_INTERNAL_JWT_AUDIENCE:-internal-services}
+      FEATURES_PUBLIC_USER_API_ENABLED: ${FEATURES_PUBLIC_USER_API_ENABLED:-true}
+      FEATURES_INTERNAL_USER_API_ENABLED: ${FEATURES_INTERNAL_USER_API_ENABLED:-true}
+      FEATURES_ADMIN_API_ENABLED: ${FEATURES_ADMIN_API_ENABLED:-false}
+      FEATURES_ADMIN_AUTH_ENABLED: ${FEATURES_ADMIN_AUTH_ENABLED:-false}
+      TZ: ${TZ:-Asia/Seoul}
+    networks:
+      user-private: {}
+      service-shared:
+        aliases:
+          - user-service
+    restart: unless-stopped
+
+volumes:
+  user_service_mysql_data_prod:
+
+networks:
+  user-private:
+    driver: bridge
+    internal: true
+  service-shared:
+    external: true
+    name: ${SERVICE_SHARED_NETWORK:-${BACKEND_SHARED_NETWORK:-${MSA_SHARED_NETWORK:-service-backbone-shared}}}
