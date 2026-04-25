@@ -11,9 +11,9 @@ user-service는 `platform-governance`, `platform-security`, `platform-security-g
 
 | Platform                              | Version  |
 |---------------------------------------|----------|
-| `platform-governance`                 | `3.0.1`  |
-| `platform-security`                   | `3.0.1`  |
-| `platform-security-governance-bridge` | `3.0.1`  |
+| `platform-governance`                 | `4.0.0`  |
+| `platform-security`                   | `4.0.0`  |
+| `platform-security-governance-bridge` | `4.0.0`  |
 
 ## Resource 도입 기준
 
@@ -66,24 +66,19 @@ implementation platform(libs.platform.governance.bom)
 implementation libs.platform.governance.starter
 implementation platform(libs.platform.security.bom)
 implementation libs.platform.security.starter
-implementation libs.platform.security.ratelimit.bridge.starter
 implementation libs.platform.security.governance.bridge
-implementation "io.github.jho951:audit-log-api"
 ```
 
-user-service 도메인 코드는 governance adapter/core/engine 구현 타입을 직접 소비하지 않습니다.
-다만 감사 SPI인 `com.auditlog.api.*`는 `io.github.jho951:audit-log-api`를 명시적으로 추가한 뒤 사용합니다.
+user-service 도메인 코드는 governance adapter/core/engine 구현 타입을 직접 소비하지 않고, `platform-governance` public contract만 사용합니다.
 
 | 용도 | 타입 |
 | --- | --- |
-| 감사 이벤트 기록 | `com.auditlog.api.AuditLogger` |
-| 감사 이벤트 sink 확장 | `com.auditlog.api.AuditSink` |
-| 감사 이벤트 envelope | `com.auditlog.api.AuditEvent` |
+| 감사 이벤트 기록 | `io.github.jho951.platform.governance.api.GovernanceAuditRecorder` |
+| 감사 이벤트 sink 확장 | `io.github.jho951.platform.governance.api.GovernanceAuditSink` |
 
 Governance 구현 규칙:
 
-- `UserAuditLogService`가 감사 이벤트 변환과 기록 경계를 담당합니다.
-- `AuditSink`, `AuditLogger`, `AuditEvent` compile surface는 `platform-governance-starter`가 아니라 `audit-log-api`가 제공합니다.
+- `UserAuditLogService`가 `GovernanceAuditRecorder`를 통해 감사 이벤트 변환과 기록 경계를 담당합니다.
 - 사용자 가입, 내부 사용자 생성, 소셜 링크, 상태 변경 시점은 user-service 도메인 코드에서 명시합니다.
 - `platform.governance.*` 설정은 `application.yml`과 환경변수에서 관리합니다.
 - business decision을 governance 모듈에 숨기지 않습니다.
@@ -138,7 +133,7 @@ platform:
 ## Security 설정
 
 user-service의 Spring Security 체인 조립은 `platform-security-starter`가 담당합니다.
-user-service는 JWT decoder/converter와 서비스별 boundary 설정만 제공합니다. raw rate-limit 연동은 `platform-security-ratelimit-bridge-starter`가 담당합니다.
+user-service는 JWT decoder/converter, 서비스별 boundary 설정, 그리고 `PlatformRateLimitPort` 구현을 직접 제공합니다.
 
 ```yaml
 platform:
@@ -185,7 +180,7 @@ platform:
 | `PLATFORM_SECURITY_INTERNAL_TOKEN_ENABLED` | `true` | internal boundary token 정책 활성화 |
 | `PLATFORM_SECURITY_GATEWAY_HEADER_ENABLED` | `true` | gateway가 검증한 사용자 식별자 헤더 인증 활성화 |
 | `PLATFORM_SECURITY_IP_GUARD_ENABLED` | `true` | 운영에서는 admin/internal boundary를 강제합니다. |
-| `PLATFORM_SECURITY_RATE_LIMIT_ENABLED` | `true` | 운영에서는 shared backing `RateLimiter`를 함께 제공합니다. |
+| `PLATFORM_SECURITY_RATE_LIMIT_ENABLED` | `true` | 운영에서는 service-owned `PlatformRateLimitPort`를 활성화합니다. |
 
 ## 감사 이벤트
 

@@ -1,13 +1,10 @@
 package com.userservice.app.domain.audit;
 
-import com.auditlog.api.AuditActorType;
-import com.auditlog.api.AuditEvent;
-import com.auditlog.api.AuditEventType;
-import com.auditlog.api.AuditLogger;
-import com.auditlog.api.AuditResult;
 import com.userservice.app.domain.user.constant.UserStatus;
 import com.userservice.app.domain.user.entity.User;
 import com.userservice.app.domain.user.entity.UserSocial;
+import io.github.jho951.platform.governance.api.AuditEntry;
+import io.github.jho951.platform.governance.api.GovernanceAuditRecorder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -19,10 +16,10 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class UserAuditLogService {
-    private final AuditLogger auditLogger;
+    private final GovernanceAuditRecorder auditRecorder;
 
-    public UserAuditLogService(AuditLogger auditLogger) {
-        this.auditLogger = auditLogger;
+    public UserAuditLogService(GovernanceAuditRecorder auditRecorder) {
+        this.auditRecorder = auditRecorder;
     }
 
     public void logSignup(User user) {
@@ -112,38 +109,12 @@ public class UserAuditLogService {
         if (piiSeed != null && !piiSeed.isBlank()) {
             attributes.put("emailHash", hashProviderUserId(piiSeed));
         }
-        auditLogger.log(
-            AuditEvent.builder(resolveEventType(eventType), eventName)
-                .occurredAt(Instant.now())
-                .actor(actorId, resolveActorType(actorType), actorId)
-                .resource(resourceType, resourceId)
-                .reason(reason)
-                .result("FAILURE".equalsIgnoreCase(result) ? AuditResult.FAILURE : AuditResult.SUCCESS)
-                .details(new LinkedHashMap<>(attributes))
-                .build()
-        );
-    }
-
-    private static AuditEventType resolveEventType(String eventType) {
-        if (eventType == null || eventType.isBlank()) {
-            return AuditEventType.CUSTOM;
-        }
-        try {
-            return AuditEventType.valueOf(eventType.trim().toUpperCase());
-        } catch (IllegalArgumentException ignored) {
-            return AuditEventType.CUSTOM;
-        }
-    }
-
-    private static AuditActorType resolveActorType(String actorType) {
-        if (actorType == null || actorType.isBlank()) {
-            return AuditActorType.UNKNOWN;
-        }
-        try {
-            return AuditActorType.valueOf(actorType.trim().toUpperCase());
-        } catch (IllegalArgumentException ignored) {
-            return AuditActorType.UNKNOWN;
-        }
+        auditRecorder.record(new AuditEntry(
+                "user",
+                eventName,
+                Map.copyOf(attributes),
+                Instant.now()
+        ));
     }
 
     private String hashProviderUserId(String value) {

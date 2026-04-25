@@ -1,13 +1,14 @@
 package com.userservice.app.config;
 
-import com.auditlog.api.AuditSink;
+import io.github.jho951.platform.governance.api.GovernanceAuditSink;
 import io.github.jho951.platform.security.policy.PlatformSecurityProperties;
-import io.github.jho951.ratelimiter.core.RateLimitDecision;
-import io.github.jho951.ratelimiter.core.RateLimitKey;
-import io.github.jho951.ratelimiter.core.RateLimitPlan;
-import io.github.jho951.ratelimiter.spi.RateLimiter;
+import io.github.jho951.platform.security.ratelimit.PlatformRateLimitDecision;
+import io.github.jho951.platform.security.ratelimit.PlatformRateLimitKeyType;
+import io.github.jho951.platform.security.ratelimit.PlatformRateLimitPort;
+import io.github.jho951.platform.security.ratelimit.PlatformRateLimitRequest;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.crypto.spec.SecretKeySpec;
@@ -21,11 +22,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 
 @Configuration
 public class UserPlatformRuntimeConfiguration {
@@ -33,17 +34,13 @@ public class UserPlatformRuntimeConfiguration {
     private static final Logger log = LoggerFactory.getLogger(UserPlatformRuntimeConfiguration.class);
 
     @Bean
-    public AuditSink userGovernanceAuditSink() {
-        return event -> log.info(
-            "governanceAudit eventId={} action={} resourceType={} resourceId={} result={} reason={} requestId={} traceId={}",
-            event.getEventId(),
-            event.getAction(),
-            event.getResourceType(),
-            event.getResourceId(),
-            event.getResult(),
-            event.getReason(),
-            event.getRequestId(),
-            event.getTraceId()
+    public GovernanceAuditSink userGovernanceAuditSink() {
+        return entry -> log.info(
+            "governanceAudit category={} message={} requestId={} traceId={}",
+            entry.category(),
+            entry.message(),
+            entry.attributes().getOrDefault("requestId", ""),
+            entry.attributes().getOrDefault("traceId", "")
         );
     }
 
@@ -59,12 +56,12 @@ public class UserPlatformRuntimeConfiguration {
 
     @Bean
     @Profile({"prod", "production", "live"})
-    public RateLimiter platformSecurityRateLimiter(
+    public PlatformRateLimitPort platformSecurityRateLimiter(
         StringRedisTemplate redisTemplate,
         @Value("${PLATFORM_SECURITY_RATE_LIMIT_REDIS_PREFIX:platform-security:rate-limit:user-service:}")
         String keyPrefix
     ) {
-        return new RedisFixedWindowRateLimiter(redisTemplate, keyPrefix, Clock.systemUTC());
+        return new RedisFixedWindowPlatformRateLimitPort(redisTemplate, keyPrefix, Clock.systemUTC());
     }
 
     private OAuth2TokenValidator<Jwt> buildJwtValidator(PlatformSecurityProperties.AuthProperties auth) {
@@ -99,12 +96,12 @@ public class UserPlatformRuntimeConfiguration {
         return value == null || value.isBlank() ? null : value.trim();
     }
 
-    private static final class RedisFixedWindowRateLimiter implements RateLimiter {
+    private static final class RedisFixedWindowPlatformRateLimitPort implements PlatformRateLimitPort {
         private final StringRedisTemplate redisTemplate;
         private final String keyPrefix;
         private final Clock clock;
 
-        private RedisFixedWindowRateLimiter(
+        private RedisFixedWindowPlatformRateLimitPort(
             StringRedisTemplate redisTemplate,
             String keyPrefix,
             Clock clock
@@ -115,28 +112,39 @@ public class UserPlatformRuntimeConfiguration {
         }
 
         @Override
-        public RateLimitDecision tryAcquire(RateLimitKey key, long permits, RateLimitPlan plan) {
-            long windowSeconds = Math.max(1L, (long) Math.ceil(plan.getCapacity() / plan.getRefillTokensPerSecond()));
+        public PlatformRateLimitDecision evaluate(PlatformRateLimitRequest request) {
+            long windowSeconds = Math.max(1L, request.windowSeconds());
             long nowSeconds = clock.instant().getEpochSecond();
             long windowIndex = nowSeconds / windowSeconds;
             long windowEndSeconds = (windowIndex + 1L) * windowSeconds;
-            String redisKey = keyPrefix + key.asString() + ":" + windowIndex;
+            String redisKey = keyPrefix
+                + keyTypeSegment(request.keyType())
+                + ":"
+                + request.key()
+                + ":"
+                + windowIndex;
 
-            Long current = redisTemplate.opsForValue().increment(redisKey, permits);
+            Long current = redisTemplate.opsForValue().increment(redisKey, request.permits());
             if (current == null) {
-                return RateLimitDecision.deny(0L, windowSeconds * 1000L);
+                return PlatformRateLimitDecision.deny(request.key(), "rate limit backend unavailable");
             }
-            if (current == permits) {
-                redisTemplate.expire(redisKey, java.time.Duration.ofSeconds(windowSeconds + 1L));
-            }
-
-            long remaining = Math.max(0L, plan.getCapacity() - current);
-            if (current <= plan.getCapacity()) {
-                return RateLimitDecision.allow(remaining);
+            if (current == request.permits()) {
+                redisTemplate.expire(redisKey, Duration.ofSeconds(windowSeconds + 1L));
             }
 
-            long retryAfterMillis = Math.max(0L, (windowEndSeconds - nowSeconds) * 1000L);
-            return RateLimitDecision.deny(remaining, retryAfterMillis);
+            if (current <= request.limit()) {
+                return PlatformRateLimitDecision.allow(request.key(), "within rate limit");
+            }
+
+            long retryAfterSeconds = Math.max(0L, windowEndSeconds - nowSeconds);
+            return PlatformRateLimitDecision.deny(
+                request.key(),
+                "rate limit exceeded for " + request.key() + "; retry_after_seconds=" + retryAfterSeconds
+            );
+        }
+
+        private String keyTypeSegment(PlatformRateLimitKeyType keyType) {
+            return keyType == PlatformRateLimitKeyType.USER ? "user" : "ip";
         }
     }
 }
